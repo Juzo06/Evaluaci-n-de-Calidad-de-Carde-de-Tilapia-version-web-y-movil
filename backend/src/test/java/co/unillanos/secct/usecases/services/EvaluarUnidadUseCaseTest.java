@@ -44,7 +44,6 @@ class EvaluarUnidadUseCaseTest {
     private LoteRepository repoVacio() {
         return new LoteRepository() {
             public Optional<Lote> findById(String id) { return Optional.empty(); }
-            public List<Lote> findDisponibles() { return Collections.emptyList(); }
             public List<Lote> findByEstadoIn(EstadoLote... estados) { return Collections.emptyList(); }
             public void save(Lote lote) {}
             public boolean existsByCodigo(CodigoLote codigo) { return false; }
@@ -65,8 +64,6 @@ class EvaluarUnidadUseCaseTest {
             }
             return Optional.empty();
         }
-
-        public List<Lote> findDisponibles() { return Collections.emptyList(); }
 
         public void save(Lote lote) {
             this.loteGuardado = lote;

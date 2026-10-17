@@ -20,8 +20,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class SecctAppTest {
 
-    private static final BigDecimal PESO = new BigDecimal("50.00");
-
     private static final ClasificadorCnnPort CNN_STUB =
             imagen -> List.of(new ResultadoClasificacion(PartePez.OJO, 3, 0.90));
 
