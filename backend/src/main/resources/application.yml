@@ -1,0 +1,29 @@
+spring:
+  application:
+    name: secct
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+  flyway:
+    enabled: true
+
+secct:
+  cnn:
+    url: ${CNN_URL:http://localhost:8000}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+
+logging:
+  file:
+    name: logs/secct.log
+  level:
+    co.unillanos.secct: INFO
