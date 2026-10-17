@@ -1,6 +1,6 @@
 package co.unillanos.secct.usecases.services;
 
-import co.unillanos.secct.adapters.ui.InicializadorDatos;
+import co.unillanos.secct.infrastructure.seed.InicializadorDatos;
 import co.unillanos.secct.entities.EstadoLote;
 import co.unillanos.secct.entities.Lote;
 import co.unillanos.secct.usecases.dto.PartePez;
