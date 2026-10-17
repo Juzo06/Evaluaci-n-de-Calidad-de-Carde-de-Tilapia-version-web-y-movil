@@ -1,4 +1,4 @@
-package co.unillanos.secct.infrastructure.config;
+package co.unillanos.secct.infrastructure.repositories.config;
 
 import co.unillanos.secct.infrastructure.repositories.ClasificadorCnnHttp;
 import co.unillanos.secct.infrastructure.repositories.GeneradorCodigoLoteSecuencial;
@@ -10,6 +10,7 @@ import co.unillanos.secct.usecases.services.SecctApp;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
 
 @Configuration
 public class BeanConfig {
