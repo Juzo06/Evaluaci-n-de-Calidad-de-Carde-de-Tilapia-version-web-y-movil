@@ -48,6 +48,7 @@ class SeleccionarLoteUseCaseTest {
             public List<Lote> findByEstadoIn(EstadoLote... estados) { return Collections.emptyList(); }
             public void save(Lote l) {}
             public boolean existsByCodigo(CodigoLote codigo) { return false; }
+        public List<Lote> findByPiscicultorId(String piscicultorId) { return Collections.emptyList(); }
         };
     }
 
@@ -65,6 +66,7 @@ class SeleccionarLoteUseCaseTest {
             }
             public void save(Lote l) {}
             public boolean existsByCodigo(CodigoLote codigo) { return false; }
+        public List<Lote> findByPiscicultorId(String piscicultorId) { return Collections.emptyList(); }
         };
     }
 
@@ -86,6 +88,7 @@ class SeleccionarLoteUseCaseTest {
             }
             public void save(Lote l) {}
             public boolean existsByCodigo(CodigoLote codigo) { return false; }
+        public List<Lote> findByPiscicultorId(String piscicultorId) { return Collections.emptyList(); }
         };
     }
 

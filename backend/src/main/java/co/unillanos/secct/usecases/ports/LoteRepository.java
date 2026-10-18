@@ -16,4 +16,7 @@ public interface LoteRepository {
     void save(Lote lote);
 
     boolean existsByCodigo(CodigoLote codigo);
+
+    /** Lotes del piscicultor, del más reciente al más antiguo. */
+    List<Lote> findByPiscicultorId(String piscicultorId);
 }

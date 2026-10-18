@@ -26,9 +26,32 @@ class PesoLoteTest {
     }
 
     @Test
-    void shouldRoundHalfUpWhenMoreThanTwoDecimals() {
-        PesoLote peso = new PesoLote(new BigDecimal("3.456"));
-        assertEquals(new BigDecimal("3.46"), peso.getValor());
+    void shouldRejectMoreThanTwoDecimals() {
+        // HU03: "hasta 2 decimales" -> ya no se redondea, se rechaza
+        IllegalArgumentException ex = assertThrows(
+                IllegalArgumentException.class,
+                () -> new PesoLote(new BigDecimal("3.456")));
+        assertTrue(ex.getMessage().contains("RN-004"));
+    }
+
+    @Test
+    void shouldAcceptTrailingZerosBeyondTwoDecimals() {
+        PesoLote peso = new PesoLote(new BigDecimal("3.4500"));
+        assertEquals(new BigDecimal("3.45"), peso.getValor());
+    }
+
+    @Test
+    void shouldAcceptMaximumValue() {
+        PesoLote peso = new PesoLote(new BigDecimal("10000.00"));
+        assertEquals(new BigDecimal("10000.00"), peso.getValor());
+    }
+
+    @Test
+    void shouldRejectValueAboveMaximum() {
+        IllegalArgumentException ex = assertThrows(
+                IllegalArgumentException.class,
+                () -> new PesoLote(new BigDecimal("10000.01")));
+        assertTrue(ex.getMessage().contains("RN-004"));
     }
 
     @Test

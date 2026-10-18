@@ -68,7 +68,7 @@ class SecctAppTest {
     void shouldIntegrateFullCU001Flow() {
         SecctApp app = appConRepoVacio();
 
-        OperationResult registro = app.registrarLote(new DatosNuevoLote(
+        OperationResult registro = app.registrarLote(new DatosNuevoLote("piscicultor-test",
                 "Estacion Piscicola Arauca",
                 LocalDate.now(),
                 new BigDecimal("60.00"),
@@ -115,7 +115,7 @@ class SecctAppTest {
     void shouldIntegrateRegistroYEvaluacionEndToEnd() {
         SecctApp app = appConRepoVacio();
 
-        app.registrarLote(new DatosNuevoLote(
+        app.registrarLote(new DatosNuevoLote("piscicultor-test",
                 "Estacion Piscicola Meta",
                 LocalDate.now(),
                 new BigDecimal("80.00"),
@@ -144,7 +144,7 @@ class SecctAppTest {
     void shouldIntegrateFullCU001ToCU004Flow() {
         SecctApp app = appConRepoVacio();
 
-        app.registrarLote(new DatosNuevoLote(
+        app.registrarLote(new DatosNuevoLote("piscicultor-test",
                 "Estacion Piscicola Meta",
                 LocalDate.now(),
                 new BigDecimal("60.00"),

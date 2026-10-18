@@ -1,23 +1,32 @@
 package co.unillanos.secct.infrastructure.repositories.config;
 
 import co.unillanos.secct.infrastructure.repositories.ClasificadorCnnHttp;
-import co.unillanos.secct.infrastructure.repositories.GeneradorCodigoLoteSecuencial;
-import co.unillanos.secct.infrastructure.repositories.InMemoryLoteRepository;
+import co.unillanos.secct.infrastructure.repositories.GeneradorCodigoLoteJdbc;
+import co.unillanos.secct.infrastructure.repositories.LogLoteAdapter;
+import co.unillanos.secct.infrastructure.repositories.jpa.EstacionJpaRepository;
+import co.unillanos.secct.infrastructure.repositories.jpa.EstadoLoteJpaRepository;
+import co.unillanos.secct.infrastructure.repositories.jpa.LoteJpaRepository;
+import co.unillanos.secct.infrastructure.repositories.jpa.LoteRepositoryJpa;
 import co.unillanos.secct.usecases.ports.ClasificadorCnnPort;
 import co.unillanos.secct.usecases.ports.GeneradorCodigoLotePort;
+import co.unillanos.secct.usecases.ports.LogLotePort;
 import co.unillanos.secct.usecases.ports.LoteRepository;
 import co.unillanos.secct.usecases.services.SecctApp;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 
 @Configuration
 public class BeanConfig {
 
     @Bean
-    public LoteRepository loteRepository() {
-        return new InMemoryLoteRepository(); // temporal: lo reemplaza el repositorio JPA
+    public LoteRepository loteRepository(LoteJpaRepository lotes,
+                                         EstacionJpaRepository estaciones,
+                                         EstadoLoteJpaRepository estados,
+                                         JdbcTemplate jdbcTemplate) {
+        return new LoteRepositoryJpa(lotes, estaciones, estados, jdbcTemplate);
     }
 
     @Bean
@@ -26,14 +35,20 @@ public class BeanConfig {
     }
 
     @Bean
-    public GeneradorCodigoLotePort generadorCodigo() {
-        return new GeneradorCodigoLoteSecuencial();
+    public GeneradorCodigoLotePort generadorCodigo(JdbcTemplate jdbcTemplate) {
+        return new GeneradorCodigoLoteJdbc(jdbcTemplate);
+    }
+
+    @Bean
+    public LogLotePort logLote(JdbcTemplate jdbcTemplate) {
+        return new LogLoteAdapter(jdbcTemplate);
     }
 
     @Bean
     public SecctApp secctApp(LoteRepository repo,
                              ClasificadorCnnPort cnn,
-                             GeneradorCodigoLotePort generador) {
-        return new SecctApp(repo, cnn, generador);
+                             GeneradorCodigoLotePort generador,
+                             LogLotePort logLote) {
+        return new SecctApp(repo, cnn, generador, logLote);
     }
 }

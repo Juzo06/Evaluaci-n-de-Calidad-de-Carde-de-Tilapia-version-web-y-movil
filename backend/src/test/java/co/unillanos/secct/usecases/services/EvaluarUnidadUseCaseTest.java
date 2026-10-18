@@ -47,6 +47,7 @@ class EvaluarUnidadUseCaseTest {
             public List<Lote> findByEstadoIn(EstadoLote... estados) { return Collections.emptyList(); }
             public void save(Lote lote) {}
             public boolean existsByCodigo(CodigoLote codigo) { return false; }
+        public List<Lote> findByPiscicultorId(String piscicultorId) { return Collections.emptyList(); }
         };
     }
 
@@ -71,6 +72,7 @@ class EvaluarUnidadUseCaseTest {
 
         public List<Lote> findByEstadoIn(EstadoLote... estados) { return Collections.emptyList(); }
         public boolean existsByCodigo(CodigoLote codigo) { return false; }
+        public List<Lote> findByPiscicultorId(String piscicultorId) { return Collections.emptyList(); }
     }
 
     private ClasificadorCnnPort clasificadorFijo(int categoria, double confianza) {

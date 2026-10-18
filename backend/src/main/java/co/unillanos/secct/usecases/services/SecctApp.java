@@ -5,6 +5,7 @@ import co.unillanos.secct.usecases.dto.DatosNuevoLote;
 import co.unillanos.secct.usecases.dto.OperationResult;
 import co.unillanos.secct.usecases.ports.ClasificadorCnnPort;
 import co.unillanos.secct.usecases.ports.GeneradorCodigoLotePort;
+import co.unillanos.secct.usecases.ports.LogLotePort;
 import co.unillanos.secct.usecases.ports.LoteRepository;
 
 import java.util.List;
@@ -18,10 +19,20 @@ public class SecctApp {
     private final EvaluarLoteUseCase evaluarLoteUseCase;
 
 
+    /** Sin log de operaciones (compatibilidad con código anterior a HU03). */
     public SecctApp(LoteRepository loteRepository,
                     ClasificadorCnnPort clasificador,
                     GeneradorCodigoLotePort generador) {
-        this.registrarLoteUseCase   = new RegistrarLoteUseCase(loteRepository, generador);
+        this(loteRepository, clasificador, generador, null);
+    }
+
+    public SecctApp(LoteRepository loteRepository,
+                    ClasificadorCnnPort clasificador,
+                    GeneradorCodigoLotePort generador,
+                    LogLotePort log) {
+        this.registrarLoteUseCase   = (log == null)
+                ? new RegistrarLoteUseCase(loteRepository, generador)
+                : new RegistrarLoteUseCase(loteRepository, generador, log);
         this.seleccionarLoteUseCase = new SeleccionarLoteUseCase(loteRepository);
         this.evaluarUnidadUseCase   = new EvaluarUnidadUseCase(loteRepository, clasificador);
         this.evaluarLoteUseCase     = new EvaluarLoteUseCase(loteRepository);
@@ -35,6 +46,10 @@ public class SecctApp {
     }
 
     // --- CU-002 Seleccionar Lote ---
+
+    public List<Lote> listarLotesDePiscicultor(String piscicultorId) {
+        return seleccionarLoteUseCase.listarDePiscicultor(piscicultorId);
+    }
 
     public List<Lote> listarLotesDisponibles() {
         return seleccionarLoteUseCase.listarDisponibles();

@@ -22,6 +22,14 @@ public class SeleccionarLoteUseCase {
         return loteRepository.findByEstadoIn(EstadoLote.ABIERTO, EstadoLote.EN_EVALUACION);
     }
 
+    /** HU03: cada piscicultor ve únicamente sus propios lotes. */
+    public List<Lote> listarDePiscicultor(String piscicultorId) {
+        if (piscicultorId == null || piscicultorId.isBlank()) {
+            return List.of();
+        }
+        return loteRepository.findByPiscicultorId(piscicultorId);
+    }
+
     public List<Lote> listarEvaluados() {
         return loteRepository.findByEstadoIn(EstadoLote.EVALUADO, EstadoLote.REPORTADO);
     }

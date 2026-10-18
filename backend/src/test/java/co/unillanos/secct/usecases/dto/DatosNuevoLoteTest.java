@@ -12,7 +12,7 @@ class DatosNuevoLoteTest {
         LocalDate fecha = LocalDate.of(2025, 5, 24);
         BigDecimal peso = new BigDecimal("120.50");
 
-        DatosNuevoLote datos = new DatosNuevoLote(
+        DatosNuevoLote datos = new DatosNuevoLote("piscicultor-test",
                 "Estacion Piscicola Meta",
                 fecha,
                 peso,
@@ -30,7 +30,7 @@ class DatosNuevoLoteTest {
 
     @Test
     void shouldStoreNullFieldsWithoutValidation() {
-        DatosNuevoLote datos = new DatosNuevoLote(
+        DatosNuevoLote datos = new DatosNuevoLote("piscicultor-test",
                 null, null, null, 0, null, null);
 
         assertNull(datos.getEstacionOrigen());
@@ -43,7 +43,7 @@ class DatosNuevoLoteTest {
 
     @Test
     void shouldStoreEmptyObservaciones() {
-        DatosNuevoLote datos = new DatosNuevoLote(
+        DatosNuevoLote datos = new DatosNuevoLote("piscicultor-test",
                 "Estacion Meta",
                 LocalDate.of(2025, 5, 24),
                 new BigDecimal("50.00"),

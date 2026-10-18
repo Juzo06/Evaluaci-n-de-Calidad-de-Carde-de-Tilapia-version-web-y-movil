@@ -60,4 +60,16 @@ public class InMemoryLoteRepository implements LoteRepository {
     public boolean existsByCodigo(CodigoLote codigo) {
         return almacen.containsKey(codigo.getValor());
     }
+
+    @Override
+    public List<Lote> findByPiscicultorId(String piscicultorId) {
+        List<Lote> resultado = new ArrayList<>();
+        for (Lote lote : almacen.values()) {
+            if (piscicultorId != null && piscicultorId.equals(lote.getPiscicultorId())) {
+                resultado.add(lote);
+            }
+        }
+        java.util.Collections.reverse(resultado); // más reciente primero
+        return resultado;
+    }
 }
