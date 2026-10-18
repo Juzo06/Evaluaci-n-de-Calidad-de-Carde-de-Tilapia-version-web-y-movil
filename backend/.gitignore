@@ -31,3 +31,7 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### SECCT: secretos y logs ###
+.env
+logs/
