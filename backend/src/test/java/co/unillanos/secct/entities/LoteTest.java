@@ -13,7 +13,6 @@ class LoteTest {
     private static Lote lote(String codigoStr, int capacidad) {
         return new Lote(
                 new CodigoLote(codigoStr),
-                "Estacion Piscicola Meta",
                 new FechaCaptura(FECHA_VALIDA),
                 new PesoLote(PESO_VALIDO),
                 capacidad,
@@ -46,7 +45,6 @@ class LoteTest {
 
         Lote lote = new Lote(
                 codigo,
-                "Estacion Piscicola Meta",
                 fecha,
                 peso,
                 15,
@@ -55,7 +53,6 @@ class LoteTest {
 
         assertEquals("ESTMETA-20250524-001", lote.getId());
         assertEquals(codigo, lote.getCodigo());
-        assertEquals("Estacion Piscicola Meta", lote.getEstacionOrigen());
         assertEquals(fecha, lote.getFechaCaptura());
         assertEquals(peso, lote.getPesoLote());
         assertEquals(15, lote.getNumeroUnidadesMuestra());
@@ -75,7 +72,6 @@ class LoteTest {
     void shouldAcceptNullObservacionesAsEmptyString() {
         Lote lote = new Lote(
                 new CodigoLote("TEST-20250524-001"),
-                "Estacion Meta",
                 new FechaCaptura(FECHA_VALIDA),
                 new PesoLote(PESO_VALIDO),
                 5,
@@ -90,44 +86,6 @@ class LoteTest {
     void shouldEnforceRN_001_WhenCodigoIsNull() {
         assertThrows(IllegalArgumentException.class, () -> new Lote(
                 null,
-                "Estacion Meta",
-                new FechaCaptura(FECHA_VALIDA),
-                new PesoLote(PESO_VALIDO),
-                5,
-                PuntoEvaluacion.ESTACION_PISCICOLA,
-                ""));
-    }
-
-    @Test
-    void shouldEnforceRN_002_WhenEstacionOrigenIsNull() {
-        assertThrows(IllegalArgumentException.class, () -> new Lote(
-                new CodigoLote("TEST-20250524-001"),
-                null,
-                new FechaCaptura(FECHA_VALIDA),
-                new PesoLote(PESO_VALIDO),
-                5,
-                PuntoEvaluacion.ESTACION_PISCICOLA,
-                ""));
-    }
-
-    @Test
-    void shouldEnforceRN_002_WhenEstacionOrigenIsBlank() {
-        assertThrows(IllegalArgumentException.class, () -> new Lote(
-                new CodigoLote("TEST-20250524-001"),
-                "   ",
-                new FechaCaptura(FECHA_VALIDA),
-                new PesoLote(PESO_VALIDO),
-                5,
-                PuntoEvaluacion.ESTACION_PISCICOLA,
-                ""));
-    }
-
-    @Test
-    void shouldEnforceRN_002_WhenEstacionOrigenExceedsMaxLength() {
-        String estacionLarga = "E".repeat(101);
-        assertThrows(IllegalArgumentException.class, () -> new Lote(
-                new CodigoLote("TEST-20250524-001"),
-                estacionLarga,
                 new FechaCaptura(FECHA_VALIDA),
                 new PesoLote(PESO_VALIDO),
                 5,
@@ -139,7 +97,6 @@ class LoteTest {
     void shouldEnforceRN_003_WhenFechaCapturaIsNull() {
         assertThrows(IllegalArgumentException.class, () -> new Lote(
                 new CodigoLote("TEST-20250524-001"),
-                "Estacion Meta",
                 null,
                 new PesoLote(PESO_VALIDO),
                 5,
@@ -151,7 +108,6 @@ class LoteTest {
     void shouldEnforceRN_004_WhenPesoLoteIsNull() {
         assertThrows(IllegalArgumentException.class, () -> new Lote(
                 new CodigoLote("TEST-20250524-001"),
-                "Estacion Meta",
                 new FechaCaptura(FECHA_VALIDA),
                 null,
                 5,
@@ -163,7 +119,6 @@ class LoteTest {
     void shouldEnforceRN_005_WhenNumeroUnidadesMuestraIsZero() {
         assertThrows(IllegalArgumentException.class, () -> new Lote(
                 new CodigoLote("TEST-20250524-001"),
-                "Estacion Meta",
                 new FechaCaptura(FECHA_VALIDA),
                 new PesoLote(PESO_VALIDO),
                 0,
@@ -175,7 +130,6 @@ class LoteTest {
     void shouldEnforceRN_005_WhenNumeroUnidadesMuestraIsNegative() {
         assertThrows(IllegalArgumentException.class, () -> new Lote(
                 new CodigoLote("TEST-20250524-001"),
-                "Estacion Meta",
                 new FechaCaptura(FECHA_VALIDA),
                 new PesoLote(PESO_VALIDO),
                 -5,
@@ -187,7 +141,6 @@ class LoteTest {
     void shouldEnforceRN_006_WhenPuntoEvaluacionIsNull() {
         assertThrows(IllegalArgumentException.class, () -> new Lote(
                 new CodigoLote("TEST-20250524-001"),
-                "Estacion Meta",
                 new FechaCaptura(FECHA_VALIDA),
                 new PesoLote(PESO_VALIDO),
                 5,
@@ -200,7 +153,6 @@ class LoteTest {
         String largas = "X".repeat(501);
         assertThrows(IllegalArgumentException.class, () -> new Lote(
                 new CodigoLote("TEST-20250524-001"),
-                "Estacion Meta",
                 new FechaCaptura(FECHA_VALIDA),
                 new PesoLote(PESO_VALIDO),
                 5,

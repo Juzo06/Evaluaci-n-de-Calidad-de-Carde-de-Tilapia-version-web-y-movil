@@ -3,7 +3,6 @@ package co.unillanos.secct.infrastructure.repositories.config;
 import co.unillanos.secct.infrastructure.repositories.ClasificadorCnnHttp;
 import co.unillanos.secct.infrastructure.repositories.GeneradorCodigoLoteJdbc;
 import co.unillanos.secct.infrastructure.repositories.LogLoteAdapter;
-import co.unillanos.secct.infrastructure.repositories.jpa.EstacionJpaRepository;
 import co.unillanos.secct.infrastructure.repositories.jpa.EstadoLoteJpaRepository;
 import co.unillanos.secct.infrastructure.repositories.jpa.LoteJpaRepository;
 import co.unillanos.secct.infrastructure.repositories.jpa.LoteRepositoryJpa;
@@ -23,10 +22,8 @@ public class BeanConfig {
 
     @Bean
     public LoteRepository loteRepository(LoteJpaRepository lotes,
-                                         EstacionJpaRepository estaciones,
-                                         EstadoLoteJpaRepository estados,
-                                         JdbcTemplate jdbcTemplate) {
-        return new LoteRepositoryJpa(lotes, estaciones, estados, jdbcTemplate);
+                                         EstadoLoteJpaRepository estados) {
+        return new LoteRepositoryJpa(lotes, estados);
     }
 
     @Bean

@@ -69,7 +69,6 @@ class SecctAppTest {
         SecctApp app = appConRepoVacio();
 
         OperationResult registro = app.registrarLote(new DatosNuevoLote("piscicultor-test",
-                "Estacion Piscicola Arauca",
                 LocalDate.now(),
                 new BigDecimal("60.00"),
                 8,
@@ -116,7 +115,6 @@ class SecctAppTest {
         SecctApp app = appConRepoVacio();
 
         app.registrarLote(new DatosNuevoLote("piscicultor-test",
-                "Estacion Piscicola Meta",
                 LocalDate.now(),
                 new BigDecimal("80.00"),
                 3,
@@ -145,7 +143,6 @@ class SecctAppTest {
         SecctApp app = appConRepoVacio();
 
         app.registrarLote(new DatosNuevoLote("piscicultor-test",
-                "Estacion Piscicola Meta",
                 LocalDate.now(),
                 new BigDecimal("60.00"),
                 3,

@@ -32,8 +32,8 @@ public class LogLoteAdapter implements LogLotePort {
     @Transactional
     public void loteRegistrado(Lote lote) {
         String descripcion = limitar("Lote " + lote.getId() + " registrado en estado "
-                + lote.getEstado() + ". Estación: " + limpiar(lote.getEstacionOrigen())
-                + ", fecha de captura: " + lote.getFechaCaptura()
+                + lote.getEstado()
+                + ". Fecha de captura: " + lote.getFechaCaptura()
                 + ", peso: " + lote.getPesoLote().getValor().toPlainString() + " kg"
                 + ", unidades de muestra: " + lote.getNumeroUnidadesMuestra() + ".");
 
@@ -43,8 +43,8 @@ public class LogLoteAdapter implements LogLotePort {
             throw new IllegalStateException(
                     "No se pudo escribir el log: falta el tipo de evento REGISTRO_LOTE (migración V2).");
         }
-        LOG.info("LOTE_REGISTRADO codigo={} piscicultor={} estacion='{}' fechaCaptura={} peso={}kg unidades={}",
-                lote.getId(), lote.getPiscicultorId(), limpiar(lote.getEstacionOrigen()),
+        LOG.info("LOTE_REGISTRADO codigo={} piscicultor={} fechaCaptura={} peso={}kg unidades={}",
+                lote.getId(), lote.getPiscicultorId(),
                 lote.getFechaCaptura(), lote.getPesoLote().getValor().toPlainString(),
                 lote.getNumeroUnidadesMuestra());
     }

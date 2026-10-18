@@ -6,8 +6,6 @@ import java.util.List;
 
 public class Lote {
 
-    public static final int MIN_ESTACION_ORIGEN = 3;
-    public static final int MAX_ESTACION_ORIGEN = 100;
     public static final int MIN_UNIDADES_MUESTRA = 1;
     public static final int MAX_UNIDADES_MUESTRA = 500;
     public static final int MAX_OBSERVACIONES = 500;
@@ -15,7 +13,6 @@ public class Lote {
 
     private final CodigoLote codigo;
     private final String piscicultorId;
-    private final String estacionOrigen;
     private final FechaCaptura fechaCaptura;
     private final PesoLote pesoLote;
     private int numeroUnidadesMuestra;
@@ -34,13 +31,12 @@ public class Lote {
      */
     @Deprecated
     public Lote(CodigoLote codigo,
-                String estacionOrigen,
                 FechaCaptura fechaCaptura,
                 PesoLote pesoLote,
                 int numeroUnidadesMuestra,
                 PuntoEvaluacion puntoEvaluacion,
                 String observaciones) {
-        this(codigo, null, estacionOrigen, fechaCaptura, pesoLote,
+        this(codigo, null, fechaCaptura, pesoLote,
                 numeroUnidadesMuestra, puntoEvaluacion, observaciones);
     }
 
@@ -49,7 +45,6 @@ public class Lote {
      */
     public static Lote nuevo(CodigoLote codigo,
                              String piscicultorId,
-                             String estacionOrigen,
                              FechaCaptura fechaCaptura,
                              PesoLote pesoLote,
                              int numeroUnidadesMuestra,
@@ -64,13 +59,12 @@ public class Lote {
                     "El identificador del piscicultor no puede superar "
                             + MAX_PISCICULTOR_ID + " caracteres.");
         }
-        return new Lote(codigo, piscicultorId.trim(), estacionOrigen, fechaCaptura,
+        return new Lote(codigo, piscicultorId.trim(), fechaCaptura,
                 pesoLote, numeroUnidadesMuestra, puntoEvaluacion, observaciones);
     }
 
     private Lote(CodigoLote codigo,
                  String piscicultorId,
-                 String estacionOrigen,
                  FechaCaptura fechaCaptura,
                  PesoLote pesoLote,
                  int numeroUnidadesMuestra,
@@ -80,22 +74,6 @@ public class Lote {
         if (codigo == null) {
             throw new IllegalArgumentException(
                     "El código del lote no puede ser nulo (RN-001).");
-        }
-        if (estacionOrigen == null || estacionOrigen.isBlank()) {
-            throw new IllegalArgumentException(
-                    "La estación de origen es obligatoria (RN-002).");
-        }
-        if (estacionOrigen.length() > MAX_ESTACION_ORIGEN) {
-            throw new IllegalArgumentException(
-                    "La estación de origen no puede superar " + MAX_ESTACION_ORIGEN
-                            + " caracteres (RN-002); longitud recibida: "
-                            + estacionOrigen.length());
-        }
-        if (estacionOrigen.trim().length() < MIN_ESTACION_ORIGEN) {
-            throw new IllegalArgumentException(
-                    "La estación de origen debe tener al menos " + MIN_ESTACION_ORIGEN
-                            + " caracteres (RN-002); longitud recibida: "
-                            + estacionOrigen.trim().length());
         }
         if (fechaCaptura == null) {
             throw new IllegalArgumentException(
@@ -128,7 +106,6 @@ public class Lote {
 
         this.codigo = codigo;
         this.piscicultorId = piscicultorId;
-        this.estacionOrigen = estacionOrigen.trim();
         this.fechaCaptura = fechaCaptura;
         this.pesoLote = pesoLote;
         this.numeroUnidadesMuestra = numeroUnidadesMuestra;
@@ -149,7 +126,6 @@ public class Lote {
      */
     public static Lote reconstruir(CodigoLote codigo,
                                    String piscicultorId,
-                                   String estacionOrigen,
                                    FechaCaptura fechaCaptura,
                                    PesoLote pesoLote,
                                    int numeroUnidadesMuestra,
@@ -158,7 +134,7 @@ public class Lote {
                                    EstadoLote estado,
                                    List<EvaluacionGuardada> evaluaciones,
                                    double clasificacionFinal) {
-        Lote lote = new Lote(codigo, piscicultorId, estacionOrigen, fechaCaptura, pesoLote,
+        Lote lote = new Lote(codigo, piscicultorId, fechaCaptura, pesoLote,
                 numeroUnidadesMuestra, puntoEvaluacion, observaciones);
         for (EvaluacionGuardada e : evaluaciones) {
             lote.evaluaciones.add(new Evaluacion(e.idImagen(), e.clasificacion(), lote));
@@ -231,10 +207,6 @@ public class Lote {
 
     public String getPiscicultorId() {
         return piscicultorId;
-    }
-
-    public String getEstacionOrigen() {
-        return estacionOrigen;
     }
 
     public FechaCaptura getFechaCaptura() {

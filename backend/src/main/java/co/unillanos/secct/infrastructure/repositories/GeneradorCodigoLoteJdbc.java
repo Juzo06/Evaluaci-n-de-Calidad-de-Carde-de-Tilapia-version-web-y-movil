@@ -11,8 +11,9 @@ import java.time.format.DateTimeFormatter;
 
 /**
  * Genera códigos {@code SECCT-AAAAMMDD-NNN} únicos y persistentes.
+ * AAAAMMDD es la FECHA DE CAPTURA del lote (la BD lo exige con ck_lote_codigo_fecha).
  * El secuencial se incrementa de forma atómica en {@code secuencia_codigo_lote}
- * (una fila por día, migración V4): no se repite aunque la aplicación se
+ * (una fila por fecha, migración V4): no se repite aunque la aplicación se
  * reinicie o haya varias instancias.
  */
 public class GeneradorCodigoLoteJdbc implements GeneradorCodigoLotePort {
@@ -40,20 +41,25 @@ public class GeneradorCodigoLoteJdbc implements GeneradorCodigoLotePort {
         this.prefijo = prefijo;
     }
 
+    @Override
+    public CodigoLote generarCodigoLote() {
+        return generarCodigoLote(LocalDate.now());
+    }
+
     /**
      * noRollbackFor: el caso de uso captura el IllegalStateException y responde un
      * fallo controlado; no debe dejar la transacción marcada para rollback.
      */
     @Override
     @Transactional(noRollbackFor = IllegalStateException.class)
-    public CodigoLote generarCodigoLote() {
-        LocalDate hoy = LocalDate.now();
-        Integer secuencial = jdbc.queryForObject(SIGUIENTE_SECUENCIAL, Integer.class, Date.valueOf(hoy));
+    public CodigoLote generarCodigoLote(LocalDate fechaCaptura) {
+        Integer secuencial = jdbc.queryForObject(SIGUIENTE_SECUENCIAL, Integer.class, Date.valueOf(fechaCaptura));
         if (secuencial == null || secuencial > MAXIMO_SECUENCIAL) {
             throw new IllegalStateException(
-                    "Se alcanzó el límite de " + MAXIMO_SECUENCIAL + " lotes para el día " + hoy + ".");
+                    "Se alcanzó el límite de " + MAXIMO_SECUENCIAL + " lotes para la fecha de captura "
+                            + fechaCaptura + ".");
         }
-        return new CodigoLote(prefijo + "-" + hoy.format(FORMATO_FECHA) + "-"
+        return new CodigoLote(prefijo + "-" + fechaCaptura.format(FORMATO_FECHA) + "-"
                 + String.format("%03d", secuencial));
     }
 }

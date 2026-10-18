@@ -1,6 +1,5 @@
 package co.unillanos.secct.infrastructure.repositories.jpa;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -9,18 +8,24 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.OrderBy;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
+import org.hibernate.annotations.SQLRestriction;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 
-/** Tabla {@code lote}. Detalle de infraestructura: el dominio usa {@code entities.Lote}. */
+/**
+ * Tabla {@code lote}. Detalle de infraestructura: el dominio usa {@code entities.Lote}.
+ * Las evaluaciones (tabla evaluacion) NO se mapean: pertenecen a la HU de evaluación,
+ * cuyo diseño de tablas cambió.
+ */
 @Entity
 @Table(name = "lote")
+// borrado lógico: las consultas ignoran los lotes marcados como eliminados
+@SQLRestriction("is_deleted = false")
 public class LoteEntity {
 
     @Id
@@ -30,10 +35,6 @@ public class LoteEntity {
 
     @Column(name = "usuario_id", nullable = false, updatable = false)
     private Integer usuarioId;
-
-    @ManyToOne(fetch = FetchType.EAGER, optional = false)
-    @JoinColumn(name = "estacion_id", nullable = false, updatable = false)
-    private EstacionEntity estacion;
 
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "estado_lote_id", nullable = false)
@@ -57,23 +58,41 @@ public class LoteEntity {
     @Column(name = "clasificacion_final", precision = 4, scale = 2)
     private BigDecimal clasificacionFinal;
 
-    @OneToMany(mappedBy = "lote", cascade = CascadeType.ALL, orphanRemoval = true)
-    @OrderBy("id ASC")
-    private List<EvaluacionEntity> evaluaciones = new ArrayList<>();
+    // Columnas de auditoría / borrado lógico (la BD las exige NOT NULL)
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private Instant createdAt;
+
+    @Column(name = "updated_at", nullable = false)
+    private Instant updatedAt;
+
+    @Column(name = "is_deleted", nullable = false)
+    private boolean deleted;
+
+    @Column(name = "deleted_at")
+    private Instant deletedAt;
+
+    @Column(name = "deleted_by")
+    private Integer deletedBy;
 
     public LoteEntity() {
     }
 
-    public void agregarEvaluacion(EvaluacionEntity evaluacion) {
-        evaluacion.setLote(this);
-        evaluaciones.add(evaluacion);
+    @PrePersist
+    void alCrear() {
+        Instant ahora = Instant.now();
+        createdAt = ahora;
+        updatedAt = ahora;
+        deleted = false;
+    }
+
+    @PreUpdate
+    void alActualizar() {
+        updatedAt = Instant.now();
     }
 
     public Integer getId() { return id; }
     public Integer getUsuarioId() { return usuarioId; }
     public void setUsuarioId(Integer usuarioId) { this.usuarioId = usuarioId; }
-    public EstacionEntity getEstacion() { return estacion; }
-    public void setEstacion(EstacionEntity estacion) { this.estacion = estacion; }
     public EstadoLoteEntity getEstadoLote() { return estadoLote; }
     public void setEstadoLote(EstadoLoteEntity estadoLote) { this.estadoLote = estadoLote; }
     public String getCodigo() { return codigo; }
@@ -88,5 +107,4 @@ public class LoteEntity {
     public void setObservaciones(String observaciones) { this.observaciones = observaciones; }
     public BigDecimal getClasificacionFinal() { return clasificacionFinal; }
     public void setClasificacionFinal(BigDecimal c) { this.clasificacionFinal = c; }
-    public List<EvaluacionEntity> getEvaluaciones() { return evaluaciones; }
 }

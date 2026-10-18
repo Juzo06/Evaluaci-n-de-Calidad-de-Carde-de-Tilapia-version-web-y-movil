@@ -31,7 +31,7 @@ class RegistrarLoteIntegrationTest {
     private SecctApp app;
 
     private static DatosNuevoLote datos(String piscicultor) {
-        return new DatosNuevoLote(piscicultor, "Estacion Piscicola Meta",
+        return new DatosNuevoLote(piscicultor,
                 LocalDate.of(2025, 5, 24), new BigDecimal("120.50"), 15,
                 "ESTACION_PISCICOLA", "Agua a 18 grados");
     }
@@ -57,7 +57,6 @@ class RegistrarLoteIntegrationTest {
             assertEquals(piscicultorA, l.getPiscicultorId());
         });
         assertEquals(new BigDecimal("120.50"), deA.get(0).getPesoLote().getValor());
-        assertEquals("Estacion Piscicola Meta", deA.get(0).getEstacionOrigen());
 
         // el piscicultor B no ve los lotes del A
         assertFalse(app.listarLotesDePiscicultor(piscicultorB).stream()
@@ -65,19 +64,13 @@ class RegistrarLoteIntegrationTest {
     }
 
     @Test
-    void shouldReuseEstacionIgnoringCaseAndWriteLog() {
-        OperationResult a = app.registrarLote(new DatosNuevoLote("1", "Estacion Unica Test",
-                LocalDate.of(2025, 5, 24), new BigDecimal("10.00"), 5, "ESTACION_PISCICOLA", ""));
-        OperationResult b = app.registrarLote(new DatosNuevoLote("1", "ESTACION UNICA TEST",
-                LocalDate.of(2025, 5, 24), new BigDecimal("10.00"), 5, "ESTACION_PISCICOLA", ""));
+    void shouldBuildCodeWithCaptureDate() {
+        // la BD exige que el código lleve la fecha de captura (ck_lote_codigo_fecha)
+        OperationResult r = app.registrarLote(new DatosNuevoLote("1",
+                LocalDate.of(2025, 3, 7), new BigDecimal("10.00"), 5, "ESTACION_PISCICOLA", ""));
 
-        assertTrue(a.isSuccess() && b.isSuccess());
-        var propios = app.listarLotesDePiscicultor("1");
-        String estacionA = propios.stream().filter(l -> l.getId().equals(a.getReferencia()))
-                .findFirst().get().getEstacionOrigen();
-        String estacionB = propios.stream().filter(l -> l.getId().equals(b.getReferencia()))
-                .findFirst().get().getEstacionOrigen();
-        assertEquals(estacionA, estacionB);
+        assertTrue(r.isSuccess());
+        assertTrue(r.getReferencia().startsWith("SECCT-20250307-"));
     }
 
     @Test
@@ -85,8 +78,8 @@ class RegistrarLoteIntegrationTest {
         String piscicultor = "2";
         int antes = app.listarLotesDePiscicultor(piscicultor).size();
 
-        OperationResult r = app.registrarLote(new DatosNuevoLote(piscicultor, "AB",
-                LocalDate.of(2025, 5, 24), new BigDecimal("10.00"), 5, "ESTACION_PISCICOLA", ""));
+        OperationResult r = app.registrarLote(new DatosNuevoLote(piscicultor,
+                LocalDate.of(2025, 5, 24), new BigDecimal("10.00"), 501, "ESTACION_PISCICOLA", ""));
 
         assertFalse(r.isSuccess());
         assertEquals(antes, app.listarLotesDePiscicultor(piscicultor).size());

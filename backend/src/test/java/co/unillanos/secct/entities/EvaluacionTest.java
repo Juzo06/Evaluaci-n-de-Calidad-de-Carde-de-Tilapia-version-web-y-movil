@@ -12,7 +12,6 @@ class EvaluacionTest {
     private Lote loteValido() {
         return new Lote(
                 new CodigoLote("TEST-20250524-001"),
-                "Estacion Piscicola Meta",
                 new FechaCaptura(FECHA_VALIDA),
                 new PesoLote(new BigDecimal("50.00")),
                 10,

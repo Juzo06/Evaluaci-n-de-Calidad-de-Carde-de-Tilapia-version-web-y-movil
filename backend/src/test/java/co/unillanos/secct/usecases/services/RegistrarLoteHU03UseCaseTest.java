@@ -40,7 +40,7 @@ class RegistrarLoteHU03UseCaseTest {
     private final RegistrarLoteUseCase useCase = new RegistrarLoteUseCase(repo, generador, log);
 
     private static DatosNuevoLote datos(String piscicultor, LocalDate fecha, BigDecimal peso, int unidades) {
-        return new DatosNuevoLote(piscicultor, "Estacion Piscicola Meta", fecha, peso,
+        return new DatosNuevoLote(piscicultor, fecha, peso,
                 unidades, "ESTACION_PISCICOLA", "");
     }
 
@@ -101,15 +101,6 @@ class RegistrarLoteHU03UseCaseTest {
 
         assertFalse(r.isSuccess());
         assertTrue(r.getMessage().contains("RN-004"));
-    }
-
-    @Test
-    void shouldRejectEstacionShorterThanThreeCharacters() {
-        OperationResult r = useCase.execute(new DatosNuevoLote("piscicultor1", "AB",
-                LocalDate.of(2025, 5, 24), new BigDecimal("10.00"), 5, "ESTACION_PISCICOLA", ""));
-
-        assertFalse(r.isSuccess());
-        assertTrue(r.getMessage().contains("RN-002"));
     }
 
     @Test

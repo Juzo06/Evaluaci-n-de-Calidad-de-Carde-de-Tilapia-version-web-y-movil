@@ -43,7 +43,6 @@ class RegistrarLoteUseCaseTest {
 
     private static DatosNuevoLote datosValidos() {
         return new DatosNuevoLote("piscicultor-test",
-                "Estacion Piscicola Meta",
                 FECHA_VALIDA,
                 PESO_VALIDO,
                 15,
@@ -101,8 +100,8 @@ class RegistrarLoteUseCaseTest {
         RegistrarLoteUseCase uc = new RegistrarLoteUseCase(repo, generadorFijo(CODIGO_VALIDO));
 
         DatosNuevoLote datosInvalidos = new DatosNuevoLote("piscicultor-test",
-                "", // RN-002: estación vacía
-                FECHA_VALIDA, PESO_VALIDO, 5, "ESTACION_PISCICOLA", "");
+                FECHA_VALIDA, PESO_VALIDO, 0, // RN-005: unidades inválidas
+                "ESTACION_PISCICOLA", "");
 
         uc.execute(datosInvalidos);
 
@@ -125,34 +124,13 @@ class RegistrarLoteUseCaseTest {
 
     // ------- RN-002: estación de origen -------
 
-    @Test
-    void shouldEnforceRN_002_WhenEstacionOrigenIsBlank() {
-        OperationResult result = ucConRepoLimpio().execute(
-                new DatosNuevoLote("piscicultor-test", "   ",
-                        FECHA_VALIDA, PESO_VALIDO, 5, "ESTACION_PISCICOLA", ""));
-
-        assertFalse(result.isSuccess());
-        assertTrue(result.getMessage().contains("RN-002"));
-    }
-
-    @Test
-    void shouldEnforceRN_002_WhenEstacionOrigenExceedsMaxLength() {
-        String estacionLarga = "E".repeat(101);
-        OperationResult result = ucConRepoLimpio().execute(
-                new DatosNuevoLote("piscicultor-test", estacionLarga,
-                        FECHA_VALIDA, PESO_VALIDO, 5, "ESTACION_PISCICOLA", ""));
-
-        assertFalse(result.isSuccess());
-        assertTrue(result.getMessage().contains("RN-002"));
-    }
-
     // ------- RN-003: fecha de captura -------
 
     @Test
     void shouldEnforceRN_003_WhenFechaCapturaIsFuture() {
         LocalDate manana = LocalDate.now().plusDays(1);
         OperationResult result = ucConRepoLimpio().execute(
-                new DatosNuevoLote("piscicultor-test", "Estacion Meta",
+                new DatosNuevoLote("piscicultor-test",
                         manana, PESO_VALIDO, 5, "ESTACION_PISCICOLA", ""));
 
         assertFalse(result.isSuccess());
@@ -164,7 +142,7 @@ class RegistrarLoteUseCaseTest {
     @Test
     void shouldEnforceRN_004_WhenPesoTotalIsBelowMinimum() {
         OperationResult result = ucConRepoLimpio().execute(
-                new DatosNuevoLote("piscicultor-test", "Estacion Meta",
+                new DatosNuevoLote("piscicultor-test",
                         FECHA_VALIDA, new BigDecimal("0.004"), 5, "ESTACION_PISCICOLA", ""));
 
         assertFalse(result.isSuccess());
@@ -176,7 +154,7 @@ class RegistrarLoteUseCaseTest {
     @Test
     void shouldEnforceRN_005_WhenNumeroUnidadesMuestraIsZero() {
         OperationResult result = ucConRepoLimpio().execute(
-                new DatosNuevoLote("piscicultor-test", "Estacion Meta",
+                new DatosNuevoLote("piscicultor-test",
                         FECHA_VALIDA, PESO_VALIDO, 0, "ESTACION_PISCICOLA", ""));
 
         assertFalse(result.isSuccess());
@@ -188,7 +166,7 @@ class RegistrarLoteUseCaseTest {
     @Test
     void shouldEnforceRN_006_WhenPuntoEvaluacionIsInvalidString() {
         OperationResult result = ucConRepoLimpio().execute(
-                new DatosNuevoLote("piscicultor-test", "Estacion Meta",
+                new DatosNuevoLote("piscicultor-test",
                         FECHA_VALIDA, PESO_VALIDO, 5, "VALOR_INEXISTENTE", ""));
 
         assertFalse(result.isSuccess());
@@ -198,7 +176,7 @@ class RegistrarLoteUseCaseTest {
     @Test
     void shouldEnforceRN_006_WhenPuntoEvaluacionIsNull() {
         OperationResult result = ucConRepoLimpio().execute(
-                new DatosNuevoLote("piscicultor-test", "Estacion Meta",
+                new DatosNuevoLote("piscicultor-test",
                         FECHA_VALIDA, PESO_VALIDO, 5, null, ""));
 
         assertFalse(result.isSuccess());
@@ -211,7 +189,7 @@ class RegistrarLoteUseCaseTest {
     void shouldEnforceRN_008_WhenObservacionesExceedMaxLength() {
         String largas = "X".repeat(501);
         OperationResult result = ucConRepoLimpio().execute(
-                new DatosNuevoLote("piscicultor-test", "Estacion Meta",
+                new DatosNuevoLote("piscicultor-test",
                         FECHA_VALIDA, PESO_VALIDO, 5, "ESTACION_PISCICOLA", largas));
 
         assertFalse(result.isSuccess());
@@ -231,7 +209,7 @@ class RegistrarLoteUseCaseTest {
                     repo, generadorFijo(CODIGO_VALIDO));
 
             OperationResult result = uc.execute(
-                    new DatosNuevoLote("piscicultor-test", "Estacion Meta",
+                    new DatosNuevoLote("piscicultor-test",
                             FECHA_VALIDA, PESO_VALIDO, 5, punto, ""));
 
             assertTrue(result.isSuccess(),

@@ -24,7 +24,6 @@ class EvaluarLoteUseCaseTest {
     private Lote lote(String codigoStr, int capacidad) {
         return new Lote(
                 new CodigoLote(codigoStr),
-                "Estacion Piscicola Meta",
                 new FechaCaptura(FECHA),
                 new PesoLote(PESO),
                 capacidad,

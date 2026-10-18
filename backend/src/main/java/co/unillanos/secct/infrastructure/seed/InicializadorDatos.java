@@ -17,7 +17,6 @@ public class InicializadorDatos {
     public void cargar() {
         app.registrarLote(new DatosNuevoLote(
                 "piscicultor-demo",
-                "Estacion Piscicola Meta",
                 LocalDate.of(2025, 5, 24),
                 new BigDecimal("120.50"),
                 15,
@@ -25,7 +24,6 @@ public class InicializadorDatos {
                 ""));
         app.registrarLote(new DatosNuevoLote(
                 "piscicultor-demo",
-                "Estacion Piscicola Meta",
                 LocalDate.of(2025, 5, 23),
                 new BigDecimal("85.00"),
                 10,

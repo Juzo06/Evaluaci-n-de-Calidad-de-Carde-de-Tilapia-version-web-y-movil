@@ -6,7 +6,6 @@ import java.time.LocalDate;
 public final class DatosNuevoLote {
 
     private final String piscicultorId;
-    private final String estacionOrigen;
     private final LocalDate fechaCaptura;
     private final BigDecimal pesoTotal;
     private final int numeroUnidadesMuestra;
@@ -14,14 +13,12 @@ public final class DatosNuevoLote {
     private final String observaciones;
 
     public DatosNuevoLote(String piscicultorId,
-                          String estacionOrigen,
                           LocalDate fechaCaptura,
                           BigDecimal pesoTotal,
                           int numeroUnidadesMuestra,
                           String puntoEvaluacion,
                           String observaciones) {
         this.piscicultorId = piscicultorId;
-        this.estacionOrigen = estacionOrigen;
         this.fechaCaptura = fechaCaptura;
         this.pesoTotal = pesoTotal;
         this.numeroUnidadesMuestra = numeroUnidadesMuestra;
@@ -30,7 +27,6 @@ public final class DatosNuevoLote {
     }
 
     public String getPiscicultorId() { return piscicultorId; }
-    public String getEstacionOrigen() { return estacionOrigen; }
     public LocalDate getFechaCaptura() { return fechaCaptura; }
     public BigDecimal getPesoTotal() { return pesoTotal; }
     public int getNumeroUnidadesMuestra() { return numeroUnidadesMuestra; }

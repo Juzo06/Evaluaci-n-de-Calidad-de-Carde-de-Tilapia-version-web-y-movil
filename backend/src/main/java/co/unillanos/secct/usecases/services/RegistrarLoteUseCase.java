@@ -66,14 +66,15 @@ public class RegistrarLoteUseCase {
 
         CodigoLote codigo;
         try {
-            codigo = generadorCodigoLote.generarCodigoLote();
+            // el código lleva la fecha de captura (regla ck_lote_codigo_fecha de la BD)
+            codigo = generadorCodigoLote.generarCodigoLote(fechaCaptura.getValor());
         } catch (IllegalStateException e) {
             return rechazar(datos, e.getMessage());
         }
 
         Lote lote;
         try {
-            lote = Lote.nuevo(codigo, datos.getPiscicultorId(), datos.getEstacionOrigen(),
+            lote = Lote.nuevo(codigo, datos.getPiscicultorId(),
                     fechaCaptura, pesoLote, datos.getNumeroUnidadesMuestra(),
                     puntoEvaluacion, datos.getObservaciones());
         } catch (IllegalArgumentException e) {

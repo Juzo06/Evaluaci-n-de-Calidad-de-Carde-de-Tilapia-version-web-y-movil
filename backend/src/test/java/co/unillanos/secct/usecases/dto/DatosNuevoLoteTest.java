@@ -13,14 +13,12 @@ class DatosNuevoLoteTest {
         BigDecimal peso = new BigDecimal("120.50");
 
         DatosNuevoLote datos = new DatosNuevoLote("piscicultor-test",
-                "Estacion Piscicola Meta",
                 fecha,
                 peso,
                 15,
                 "ESTACION_PISCICOLA",
                 "Agua a 18 grados");
 
-        assertEquals("Estacion Piscicola Meta", datos.getEstacionOrigen());
         assertEquals(fecha, datos.getFechaCaptura());
         assertEquals(peso, datos.getPesoTotal());
         assertEquals(15, datos.getNumeroUnidadesMuestra());
@@ -31,9 +29,8 @@ class DatosNuevoLoteTest {
     @Test
     void shouldStoreNullFieldsWithoutValidation() {
         DatosNuevoLote datos = new DatosNuevoLote("piscicultor-test",
-                null, null, null, 0, null, null);
+                null, null, 0, null, null);
 
-        assertNull(datos.getEstacionOrigen());
         assertNull(datos.getFechaCaptura());
         assertNull(datos.getPesoTotal());
         assertEquals(0, datos.getNumeroUnidadesMuestra());
@@ -44,7 +41,6 @@ class DatosNuevoLoteTest {
     @Test
     void shouldStoreEmptyObservaciones() {
         DatosNuevoLote datos = new DatosNuevoLote("piscicultor-test",
-                "Estacion Meta",
                 LocalDate.of(2025, 5, 24),
                 new BigDecimal("50.00"),
                 5,
