@@ -1,11 +1,9 @@
-import React, { useState } from "react";
+import { useEffect, useState } from "react";
 import type { LoginRequestDTO, LoginResponseDTO } from "../types/auth";
-import { login, logout } from "../services/authService";
+import { login } from "../services/authService";
 import {
   saveSession,
   removeLocalToken as clearStoredSession,
-  isAuthenticated,
-  getRoleCode,
 } from "../services/authStorage";
 import { validateLoginForm, LoginFormErrors } from "../validation/authValidation";
 
@@ -25,17 +23,9 @@ export default function LoginPage() {
     clearStoredSession();
   };
 
-  // DC-HU2 explicit method: submitLogout(): void
-  const submitLogout = async (): Promise<void> => {
-    try {
-      await logout();
-    } catch {
-      // In case of error, still clear local token
-    } finally {
-      removeLocalToken();
-      window.location.replace("#/login");
-    }
-  };
+  useEffect(() => {
+    removeLocalToken();
+  }, []);
 
   // DC-HU2 explicit method: showLoginResult(response: LoginResponseDTO): void
   const showLoginResult = (response: LoginResponseDTO): void => {
