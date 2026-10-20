@@ -66,6 +66,19 @@ public class User {
     public User() {
     }
 
+    public User(Role role, String firstName, String lastName, String email, String phone,
+                String passwordHash, String salt) {
+        this.role = role;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.phone = phone;
+        this.passwordHash = passwordHash;
+        this.salt = salt;
+        this.active = true;
+        this.isDeleted = false;
+    }
+
     public User(Integer id, Role role, String firstName, String lastName, String email, String phone,
                 String passwordHash, String salt, boolean active, boolean isDeleted,
                 OffsetDateTime deletedAt, Integer deletedBy, OffsetDateTime createdAt, OffsetDateTime updatedAt) {

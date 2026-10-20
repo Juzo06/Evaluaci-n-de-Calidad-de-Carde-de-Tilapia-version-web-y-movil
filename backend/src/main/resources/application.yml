@@ -29,6 +29,7 @@ secct:
     url: ${CNN_URL:http://localhost:8000}
   jwt:
     secret: ${JWT_SECRET:un_secreto_super_seguro_de_al_menos_32_caracteres_12345}
+    expirationMinutes: ${JWT_EXPIRATION_MINUTES:30}
   cors:
     allowedOrigin: ${CORS_ORIGIN:http://localhost:5173}
 

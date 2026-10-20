@@ -30,3 +30,29 @@ export interface RegisterUserFormValues {
 }
 
 export type RegisterUserFormField = keyof RegisterUserFormValues;
+
+/**
+ * DTO sent to POST /api/auth/login according to DC-HU2.
+ */
+export interface LoginRequestDTO {
+  email: string;
+  password: string;
+}
+
+/**
+ * DTO received from POST /api/auth/login according to DC-HU2 (PU-10, PL-2.12).
+ */
+export interface LoginResponseDTO {
+  id: number;
+  email: string;
+  roleCode: string;
+  accessToken: string;
+  expiresInMinutes: number;
+}
+
+export interface LoginFormValues {
+  email: string;
+  password: string;
+}
+
+export type LoginFormField = keyof LoginFormValues;

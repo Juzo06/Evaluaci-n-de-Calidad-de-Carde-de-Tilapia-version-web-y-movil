@@ -307,6 +307,17 @@ export default function UserRegistrationForm({ onSubmit, onCancel }: UserRegistr
             )}
           </button>
         </div>
+
+        <div className="mt-4 text-center text-sm text-[#4d6a80]">
+          ¿Ya tienes una cuenta?{" "}
+          <a
+            href="#/login"
+            id="register-to-login-link"
+            className="text-[#0b4f7a] font-semibold underline underline-offset-4 hover:text-[#083a5a]"
+          >
+            Inicia sesión aquí
+          </a>
+        </div>
       </form>
     </section>
   );

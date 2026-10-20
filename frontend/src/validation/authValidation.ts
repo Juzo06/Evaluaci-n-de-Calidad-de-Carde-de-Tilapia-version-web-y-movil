@@ -77,3 +77,46 @@ export function toRegisterUserRequest(values: RegisterUserFormValues): RegisterU
     password: values.password,
   };
 }
+
+export type LoginFormErrors = Partial<Record<"email" | "password", string>>;
+
+/**
+ * Validates login form values according to DC-HU2 and cases PL-2.01 to PL-2.08.
+ */
+export function validateLoginForm(values: { email: string; password: string }): LoginFormErrors {
+  const errors: LoginFormErrors = {};
+
+  // 1. Email validations (PL-2.01, PL-2.03, PL-2.05, PL-2.06)
+  const trimmedEmail = values.email.trim();
+  if (!trimmedEmail) {
+    errors.email = "El correo es obligatorio";
+  } else if (trimmedEmail.length < 6 || trimmedEmail.length > 100) {
+    errors.email = "El correo debe tener entre 6 y 100 caracteres";
+  } else if (!EMAIL_PATTERN.test(trimmedEmail)) {
+    errors.email = "El formato de correo no es válido";
+  }
+
+  // 2. Password validations (PL-2.02, PL-2.04, PL-2.07, PL-2.08)
+  if (!values.password) {
+    errors.password = "La contraseña es obligatoria";
+  } else if (values.password.trim().length === 0) {
+    errors.password = "La contraseña no puede consistir solo de espacios";
+  } else if (values.password.length < 8) {
+    errors.password = "La contraseña debe tener mínimo 8 caracteres";
+  } else if (values.password.length > 20) {
+    errors.password = "La contraseña debe tener máximo 20 caracteres";
+  }
+
+  return errors;
+}
+
+/**
+ * Normalizes email and builds the request body for POST /api/auth/login (PL-2.10).
+ */
+export function toLoginRequest(values: { email: string; password: string }): { email: string; password: string } {
+  return {
+    email: values.email.trim().toLowerCase(),
+    password: values.password,
+  };
+}
+

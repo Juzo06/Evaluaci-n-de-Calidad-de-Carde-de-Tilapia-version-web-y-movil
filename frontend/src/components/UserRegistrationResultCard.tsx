@@ -57,6 +57,16 @@ export default function UserRegistrationResultCard({
       <footer className="flex flex-col-reverse sm:flex-row justify-end gap-3 mt-6 pt-4 border-t border-[#e6eef5]">
         <button
           type="button"
+          id="registered-go-to-login-button"
+          onClick={() => {
+            window.location.hash = "#/login";
+          }}
+          className="o h-12 px-6 rounded-xl border border-[#0b4f7a] text-[#0b4f7a] font-semibold hover:bg-slate-50 transition-colors"
+        >
+          Iniciar Sesión
+        </button>
+        <button
+          type="button"
           onClick={() => {
             window.location.hash = "#/register";
           }}

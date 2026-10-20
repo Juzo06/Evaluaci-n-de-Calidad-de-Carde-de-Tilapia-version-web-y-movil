@@ -4,6 +4,8 @@ import BatchResultCard from "../components/BatchResultCard";
 import { registerBatch } from "../services/batchService";
 import type { BatchResponseDTO, RegisterBatchRequestDTO } from "../types/batch";
 
+import SideNav from "../components/SideNav";
+
 export default function RegisterBatchPage() {
   const [registeredBatch, setRegisteredBatch] = useState<BatchResponseDTO | null>(null);
 
@@ -18,14 +20,7 @@ export default function RegisterBatchPage() {
 
   return (
     <main className="app">
-      <nav className="side" aria-label="Menú principal">
-        <h3 style={{ fontSize: "24px", padding: "0 16px 20px" }}>Calidad de Tilapia</h3>
-        <a href="#/registro">Registrar usuario</a>
-        <a href="#/register" aria-current="page">Registrar lote</a>
-        <a href="#/evaluate">Evaluar lote</a>
-        <a href="m-hu5.html">Lotes evaluados</a>
-        <a href="m-hu2.html">Cerrar sesión</a>
-      </nav>
+      <SideNav current="register" />
       <section className="main">
         <header className="top">
           <hgroup>

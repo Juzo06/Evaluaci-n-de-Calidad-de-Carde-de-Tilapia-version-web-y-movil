@@ -5,6 +5,7 @@ import UnitResultsCard from "../components/UnitResultsCard";
 import { ApiError } from "../services/apiClient";
 import { getBatchByCode, listAvailableBatches } from "../services/batchService";
 import { closeEvaluation as requestCloseEvaluation, evaluateUnit } from "../services/evaluationService";
+import SideNav from "../components/SideNav";
 import type { BatchResponseDTO } from "../types/batch";
 import type { EvaluatedUnitRow } from "../types/evaluation";
 
@@ -98,14 +99,7 @@ export default function EvaluateBatchPage() {
 
   return (
     <main className="app">
-      <nav className="side" aria-label="Menú principal">
-        <h3 style={{ fontSize: "24px", padding: "0 16px 20px" }}>Calidad de Tilapia</h3>
-        <a href="#/registro">Registrar usuario</a>
-        <a href="#/register">Registrar lote</a>
-        <a href="#/evaluate" aria-current="page">Evaluar lote</a>
-        <a href="m-hu5.html">Lotes evaluados</a>
-        <a href="m-hu2.html">Cerrar sesión</a>
-      </nav>
+      <SideNav current="evaluate" />
       <section className="main">
         <header className="top">
           <hgroup>
