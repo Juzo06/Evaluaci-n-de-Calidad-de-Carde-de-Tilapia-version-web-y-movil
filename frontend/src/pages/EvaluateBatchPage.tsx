@@ -6,6 +6,7 @@ import { ApiError } from "../services/apiClient";
 import { getBatchByCode, listAvailableBatches } from "../services/batchService";
 import { closeEvaluation as requestCloseEvaluation, evaluateUnit } from "../services/evaluationService";
 import SideNav from "../components/SideNav";
+import { getUserFullName } from "../services/authStorage";
 import type { BatchResponseDTO } from "../types/batch";
 import type { EvaluatedUnitRow } from "../types/evaluation";
 
@@ -97,33 +98,42 @@ export default function EvaluateBatchPage() {
   const canUpload = selectedBatch !== null && !allClassified && !isEvaluated;
   const canClose = selectedBatch !== null && allClassified && !isEvaluated;
 
+  const userFullName = getUserFullName();
+
   return (
-    <main className="app">
+    <div className="app min-h-screen">
       <SideNav current="evaluate" />
-      <section className="main">
+      <main id="main-content" className="main">
         <header className="top">
           <hgroup>
-            <h1 style={{ fontSize: "36px" }}>Evaluar lote</h1>
+            <h1 id="evaluate-batch-title" style={{ fontSize: "36px" }}>Evaluar lote</h1>
             <p style={{ margin: "4px 0 0" }}>Carga una imagen por unidad y el sistema la clasifica.</p>
           </hgroup>
-          <span className="badge">[Nombre Apellido]</span>
+          <span aria-label="Usuario autenticado" className="bg-[#e6eff6] text-[#094b72] px-4 py-1.5 rounded-full text-xs font-semibold shadow-sm">
+            {userFullName}
+          </span>
         </header>
         {pageError && (
-          <small role="alert" style={errorStyle}>
-            {pageError}
-          </small>
+          <aside role="alert" aria-live="assertive">
+            <small style={errorStyle}>{pageError}</small>
+          </aside>
         )}
-        <section style={{ display: "flex", gap: "20px" }}>
-          <div style={{ display: "flex", flexDirection: "column", gap: "20px", width: "420px" }}>
-            <section className="card">
-              <BatchSelector
-                batches={batches}
-                selectedCode={selectedBatch && !isEvaluated ? selectedBatch.code : ""}
-                isLoading={isLoadingBatches}
-                disabled={isUploading || isClosing}
-                onSelect={(code) => void selectBatch(code)}
-              />
-            </section>
+        <div style={{ display: "flex", gap: "20px" }}>
+          <section
+            aria-labelledby="batch-selection-title"
+            className="card"
+            style={{ width: "420px", display: "flex", flexDirection: "column", gap: "20px", alignSelf: "flex-start" }}
+          >
+            <header className="sr-only">
+              <h2 id="batch-selection-title">Selección de lote y carga de muestra</h2>
+            </header>
+            <BatchSelector
+              batches={batches}
+              selectedCode={selectedBatch && !isEvaluated ? selectedBatch.code : ""}
+              isLoading={isLoadingBatches}
+              disabled={isUploading || isClosing}
+              onSelect={(code) => void selectBatch(code)}
+            />
             <UnitImageForm
               classifiedCount={classifiedCount}
               totalUnits={totalUnits}
@@ -131,16 +141,18 @@ export default function EvaluateBatchPage() {
               isUploading={isUploading}
               onSubmit={(image) => (selectedBatch ? submitUnitEvaluation(selectedBatch.code, image) : Promise.resolve(false))}
             />
-          </div>
-          <UnitResultsCard
-            rows={rows}
-            canClose={canClose}
-            isClosing={isClosing}
-            closedBatch={closedBatch}
-            onClose={() => selectedBatch && void closeEvaluation(selectedBatch.code)}
-          />
-        </section>
-      </section>
-    </main>
+          </section>
+          <section aria-labelledby="unit-results-title" style={{ flex: 1, display: "flex" }}>
+            <UnitResultsCard
+              rows={rows}
+              canClose={canClose}
+              isClosing={isClosing}
+              closedBatch={closedBatch}
+              onClose={() => selectedBatch && void closeEvaluation(selectedBatch.code)}
+            />
+          </section>
+        </div>
+      </main>
+    </div>
   );
 }

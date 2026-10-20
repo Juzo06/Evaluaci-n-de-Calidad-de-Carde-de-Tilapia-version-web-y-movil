@@ -13,3 +13,8 @@ export function listAvailableBatches(): Promise<BatchResponseDTO[]> {
 export function getBatchByCode(code: string): Promise<BatchResponseDTO> {
   return apiGet<BatchResponseDTO>(`/api/batches/${encodeURIComponent(code)}`);
 }
+
+/** HU-05: Consult evaluated batches of the current user. */
+export function consultEvaluatedBatches(): Promise<BatchResponseDTO[]> {
+  return apiGet<BatchResponseDTO[]>("/api/batches/evaluated");
+}

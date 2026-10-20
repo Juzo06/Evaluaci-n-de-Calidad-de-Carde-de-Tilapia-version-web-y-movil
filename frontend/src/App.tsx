@@ -4,9 +4,10 @@ import RegisterBatchPage from "./pages/RegisterBatchPage";
 import RegisterUserPage from "./pages/RegisterUserPage";
 import LoginPage from "./pages/LoginPage";
 import AdminPage from "./pages/AdminPage";
+import EvaluatedBatchesPage from "./pages/EvaluatedBatchesPage";
 import { isAuthenticated, getRoleCode } from "./services/authStorage";
 
-type Route = "login" | "registro" | "evaluate" | "registerBatch" | "admin";
+type Route = "login" | "registro" | "evaluate" | "registerBatch" | "admin" | "evaluated";
 
 function getCurrentRoute(): Route {
   const hash = window.location.hash.toLowerCase();
@@ -23,15 +24,22 @@ function getCurrentRoute(): Route {
   if (hash === "#/evaluate") {
     return "evaluate";
   }
+  if (hash === "#/evaluados" || hash === "#/evaluated" || hash === "#/lotes-evaluados") {
+    return "evaluated";
+  }
   if (hash === "#/register" || hash === "#/register-batch") {
     return "registerBatch";
   }
 
   // Root or unmapped route
-  if (!isAuthenticated()) {
+  if (!authenticated()) {
     return "login";
   }
   return getRoleCode() === "ADMINISTRADOR" ? "admin" : "registerBatch";
+}
+
+function authenticated(): boolean {
+  return isAuthenticated();
 }
 
 export default function App() {
@@ -43,10 +51,10 @@ export default function App() {
     return () => window.removeEventListener("hashchange", handleHashChange);
   }, []);
 
-  const authenticated = isAuthenticated();
+  const auth = isAuthenticated();
 
   // Protected routes check: redirect to #/login if unauthenticated (PS-06, PL-2.19)
-  if (!authenticated && (route === "registerBatch" || route === "evaluate" || route === "admin")) {
+  if (!auth && (route === "registerBatch" || route === "evaluate" || route === "admin" || route === "evaluated")) {
     if (window.location.hash !== "#/login") {
       window.location.replace("#/login");
     }
@@ -54,7 +62,7 @@ export default function App() {
   }
 
   // If already authenticated and on login page, redirect to role home
-  if (authenticated && route === "login") {
+  if (auth && route === "login") {
     const role = getRoleCode();
     const destination = role === "ADMINISTRADOR" ? "#/admin" : "#/register";
     window.location.replace(destination);
@@ -75,6 +83,10 @@ export default function App() {
 
   if (route === "evaluate") {
     return <EvaluateBatchPage />;
+  }
+
+  if (route === "evaluated") {
+    return <EvaluatedBatchesPage />;
   }
 
   return <RegisterBatchPage />;

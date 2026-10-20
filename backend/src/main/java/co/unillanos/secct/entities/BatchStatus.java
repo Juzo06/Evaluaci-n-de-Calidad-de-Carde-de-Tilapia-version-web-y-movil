@@ -20,7 +20,12 @@ public class BatchStatus {
     @Column(name = "codigo", nullable = false, unique = true)
     private String code;
 
-    protected BatchStatus() {
+    public BatchStatus() {
+    }
+
+    public BatchStatus(Short id, String code) {
+        this.id = id;
+        this.code = code;
     }
 
     public Short getId() {

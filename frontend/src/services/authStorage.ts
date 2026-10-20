@@ -6,12 +6,36 @@ const TOKEN_KEY = "secct_token";
 const ROLE_KEY = "secct_role";
 const EMAIL_KEY = "secct_email";
 const USER_ID_KEY = "secct_user_id";
+const FULL_NAME_KEY = "secct_full_name";
 
 export interface AuthSession {
   accessToken: string;
   roleCode: string;
   email: string;
   id: number;
+  fullName?: string;
+}
+
+function extractFullNameFromToken(token: string): string | null {
+  try {
+    const parts = token.split(".");
+    if (parts.length >= 2) {
+      const payloadBase64 = parts[1].replace(/-/g, "+").replace(/_/g, "/");
+      const jsonPayload = decodeURIComponent(
+        atob(payloadBase64)
+          .split("")
+          .map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
+          .join("")
+      );
+      const parsed = JSON.parse(jsonPayload);
+      if (parsed.fullName && typeof parsed.fullName === "string" && parsed.fullName.trim() !== "") {
+        return parsed.fullName.trim();
+      }
+    }
+  } catch {
+    // ignore
+  }
+  return null;
 }
 
 /**
@@ -22,11 +46,20 @@ export function saveSession(session: {
   roleCode: string;
   email: string;
   id: number;
+  fullName?: string;
 }): void {
   localStorage.setItem(TOKEN_KEY, session.accessToken);
   localStorage.setItem(ROLE_KEY, session.roleCode);
   localStorage.setItem(EMAIL_KEY, session.email);
   localStorage.setItem(USER_ID_KEY, String(session.id));
+
+  const resolvedName =
+    session.fullName?.trim() ||
+    extractFullNameFromToken(session.accessToken) ||
+    (session.email ? session.email.split("@")[0] : "");
+  if (resolvedName) {
+    localStorage.setItem(FULL_NAME_KEY, resolvedName);
+  }
 }
 
 /**
@@ -68,6 +101,35 @@ export function getUserId(): number | null {
 }
 
 /**
+ * Retrieves the stored user full name, or falls back to resolving from token/email.
+ */
+export function getUserFullName(): string {
+  const stored = localStorage.getItem(FULL_NAME_KEY);
+  if (stored && stored.trim() !== "") {
+    return stored.trim();
+  }
+  const token = getToken();
+  if (token) {
+    const fromToken = extractFullNameFromToken(token);
+    if (fromToken) {
+      localStorage.setItem(FULL_NAME_KEY, fromToken);
+      return fromToken;
+    }
+  }
+  const email = getUserEmail();
+  if (email) {
+    const prefix = email.split("@")[0].replace(/[._-]+/g, " ").trim();
+    if (prefix) {
+      return prefix
+        .split(" ")
+        .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+        .join(" ");
+    }
+  }
+  return "Piscicultor";
+}
+
+/**
  * Retrieves full active session if present.
  */
 export function getSession(): AuthSession | null {
@@ -78,6 +140,7 @@ export function getSession(): AuthSession | null {
     roleCode: getRoleCode() ?? "",
     email: getUserEmail() ?? "",
     id: getUserId() ?? 0,
+    fullName: getUserFullName(),
   };
 }
 
@@ -96,6 +159,7 @@ export function removeLocalToken(): void {
   localStorage.removeItem(ROLE_KEY);
   localStorage.removeItem(EMAIL_KEY);
   localStorage.removeItem(USER_ID_KEY);
+  localStorage.removeItem(FULL_NAME_KEY);
 }
 
 /**

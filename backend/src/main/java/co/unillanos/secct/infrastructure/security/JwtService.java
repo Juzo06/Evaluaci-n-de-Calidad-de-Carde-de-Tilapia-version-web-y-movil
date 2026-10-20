@@ -40,10 +40,14 @@ public class JwtService {
         Instant now = Instant.now();
         Instant exp = now.plus(expirationMinutes, ChronoUnit.MINUTES);
         String roleCode = user.getRole() != null ? user.getRole().getCode() : null;
+        String firstName = user.getFirstName() != null ? user.getFirstName().trim() : "";
+        String lastName = user.getLastName() != null ? user.getLastName().trim() : "";
+        String fullName = (firstName + " " + lastName).trim();
 
         return Jwts.builder()
                 .subject(String.valueOf(user.getId()))
                 .claim("roleCode", roleCode)
+                .claim("fullName", fullName.isEmpty() ? null : fullName)
                 .issuedAt(Date.from(now))
                 .expiration(Date.from(exp))
                 .signWith(signingKey, Jwts.SIG.HS256)
@@ -91,6 +95,13 @@ public class JwtService {
      */
     public String getRoleCode(String token) {
         return parseClaims(token).get("roleCode", String.class);
+    }
+
+    /**
+     * Extracts the fullName claim from a valid token if present.
+     */
+    public String getFullName(String token) {
+        return parseClaims(token).get("fullName", String.class);
     }
 
     public int getExpirationMinutes() {

@@ -22,11 +22,11 @@ public class EvaluationPoint {
     private Integer id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "id_evaluacion", nullable = false, updatable = false)
+    @JoinColumn(name = "evaluacion_id", nullable = false, updatable = false)
     private Evaluation evaluation;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "id_parte_pez", nullable = false, updatable = false)
+    @JoinColumn(name = "parte_pez_id", nullable = false, updatable = false)
     private FishPart fishPart;
 
     @Column(name = "categoria_ntc", nullable = false)

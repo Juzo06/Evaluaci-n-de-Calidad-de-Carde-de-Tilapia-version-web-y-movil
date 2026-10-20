@@ -31,7 +31,7 @@ public class Batch {
     @Column(name = "fecha_captura", nullable = false)
     private LocalDate captureDate;
 
-    @Column(name = "peso_kg", nullable = false, precision = 7, scale = 2)
+    @Column(name = "peso", nullable = false, precision = 7, scale = 2)
     private BigDecimal weightKg;
 
     @Column(name = "numero_unidades_muestra", nullable = false)
@@ -44,27 +44,27 @@ public class Batch {
     private BigDecimal finalClassification;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "id_usuario", nullable = false, updatable = false)
+    @JoinColumn(name = "usuario_id", nullable = false, updatable = false)
     private User owner;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "id_estado_lote", nullable = false)
+    @JoinColumn(name = "estado_lote_id", nullable = false)
     private BatchStatus status;
 
-    @Column(name = "eliminado", nullable = false)
-    private boolean isDeleted;
+    @Column(name = "is_deleted", nullable = false)
+    private boolean isDeleted = false;
 
-    @Column(name = "eliminado_en")
+    @Column(name = "deleted_at")
     private OffsetDateTime deletedAt;
 
-    @Column(name = "eliminado_por")
+    @Column(name = "deleted_by")
     private Integer deletedBy;
 
-    @Column(name = "creado_en", nullable = false, updatable = false)
-    private OffsetDateTime createdAt;
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private OffsetDateTime createdAt = OffsetDateTime.now();
 
-    @Column(name = "actualizado_en", nullable = false)
-    private OffsetDateTime updatedAt;
+    @Column(name = "updated_at", nullable = false)
+    private OffsetDateTime updatedAt = OffsetDateTime.now();
 
     protected Batch() {
     }
@@ -79,6 +79,9 @@ public class Batch {
         this.owner = owner;
         this.status = status;
         this.isDeleted = false;
+        OffsetDateTime now = OffsetDateTime.now();
+        this.createdAt = now;
+        this.updatedAt = now;
     }
 
     /** A batch accepts new evaluated units only while it is ABIERTO or EN_EVALUACION. */

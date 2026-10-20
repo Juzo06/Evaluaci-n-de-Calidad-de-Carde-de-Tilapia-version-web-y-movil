@@ -10,12 +10,12 @@ export default function UserRegistrationResultCard({
   onRegisterAnother,
 }: UserRegistrationResultCardProps) {
   return (
-    <section
+    <article
       className="card w-full max-w-[860px] mx-auto p-6 sm:p-8 bg-white border border-[#d5e3ee] rounded-2xl shadow-sm"
       aria-live="polite"
       role="status"
     >
-      <div className="flex items-center gap-3 text-emerald-700 mb-2">
+      <header className="flex items-center gap-3 text-emerald-700 mb-2">
         <svg
           className="w-8 h-8 flex-shrink-0"
           fill="none"
@@ -31,28 +31,30 @@ export default function UserRegistrationResultCard({
           />
         </svg>
         <h2 className="text-2xl sm:text-3xl font-serif text-[#0b3a5a]">Usuario registrado exitosamente</h2>
-      </div>
+      </header>
 
       <p className="text-sm text-[#4d6a80] mb-6">
         El nuevo usuario piscicultor ha sido registrado en el sistema y se le ha asignado su identificador único.
       </p>
 
-      <div className="bg-[#f3f8fc] rounded-xl p-4 sm:p-5 flex flex-col gap-3 border border-[#dcebf6] text-sm">
+      <dl className="bg-[#f3f8fc] rounded-xl p-4 sm:p-5 flex flex-col gap-3 border border-[#dcebf6] text-sm m-0">
         <div className="flex justify-between items-center border-b border-[#e6eef5] pb-2">
-          <span className="text-[#4d6a80]">ID de Usuario:</span>
-          <strong className="text-[#0b3a5a] text-base font-mono">#{user.id}</strong>
+          <dt className="text-[#4d6a80]">ID de Usuario:</dt>
+          <dd className="m-0"><strong className="text-[#0b3a5a] text-base font-mono">#{user.id}</strong></dd>
         </div>
         <div className="flex justify-between items-center border-b border-[#e6eef5] pb-2">
-          <span className="text-[#4d6a80]">Correo Electrónico:</span>
-          <strong className="text-[#0b3a5a] text-base">{user.email}</strong>
+          <dt className="text-[#4d6a80]">Correo Electrónico:</dt>
+          <dd className="m-0"><strong className="text-[#0b3a5a] text-base">{user.email}</strong></dd>
         </div>
         <div className="flex justify-between items-center">
-          <span className="text-[#4d6a80]">Rol Asignado:</span>
-          <span className="bg-[#dcebf6] text-[#0b4f7a] text-xs font-semibold px-3 py-1 rounded-full">
-            PISCICULTOR
-          </span>
+          <dt className="text-[#4d6a80]">Rol Asignado:</dt>
+          <dd className="m-0">
+            <span className="bg-[#dcebf6] text-[#0b4f7a] text-xs font-semibold px-3 py-1 rounded-full">
+              PISCICULTOR
+            </span>
+          </dd>
         </div>
-      </div>
+      </dl>
 
       <footer className="flex flex-col-reverse sm:flex-row justify-end gap-3 mt-6 pt-4 border-t border-[#e6eef5]">
         <button
@@ -82,6 +84,6 @@ export default function UserRegistrationResultCard({
           Registrar otro usuario
         </button>
       </footer>
-    </section>
+    </article>
   );
 }

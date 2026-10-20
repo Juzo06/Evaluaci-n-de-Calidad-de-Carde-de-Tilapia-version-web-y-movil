@@ -28,13 +28,13 @@ public class Evaluation {
     private Integer id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "id_lote", nullable = false, updatable = false)
+    @JoinColumn(name = "lote_id", nullable = false, updatable = false)
     private Batch batch;
 
-    @Column(name = "referencia_imagen", nullable = false, updatable = false, length = 100)
+    @Column(name = "id_imagen", nullable = false, updatable = false, length = 100)
     private String imageReference;
 
-    @Column(name = "evaluado_en", nullable = false, updatable = false)
+    @Column(name = "fecha_evaluacion", nullable = false, updatable = false)
     private OffsetDateTime evaluatedAt;
 
     @OneToMany(mappedBy = "evaluation", cascade = CascadeType.ALL, orphanRemoval = true)

@@ -17,13 +17,17 @@ export default function BatchSelector({ batches, selectedCode, isLoading, disabl
   }
 
   return (
-    <label>
-      Lote disponible
+    <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+      <label htmlFor="batchCode" style={{ fontSize: "14px" }}>
+        Lote disponible
+      </label>
       <select
+        id="batchCode"
         name="batchCode"
         value={selectedCode}
         onChange={handleChange}
         disabled={disabled || isLoading || !hasBatches}
+        aria-describedby={!isLoading && !hasBatches ? "batchCodeHelp" : undefined}
       >
         {isLoading && <option value="">Cargando lotes...</option>}
         {!isLoading && !hasBatches && <option value="">Sin resultados</option>}
@@ -34,7 +38,11 @@ export default function BatchSelector({ batches, selectedCode, isLoading, disabl
           </option>
         ))}
       </select>
-      {!isLoading && !hasBatches && <small role="status">Sin resultados: no tienes lotes disponibles para evaluar</small>}
-    </label>
+      {!isLoading && !hasBatches && (
+        <small id="batchCodeHelp" role="status">
+          Sin resultados: no tienes lotes disponibles para evaluar
+        </small>
+      )}
+    </div>
   );
 }

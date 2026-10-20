@@ -47,6 +47,17 @@ public class EvaluationController {
     }
 
     private Integer getAuthenticatedUserId() {
-        return (Integer) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        var auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null || auth.getPrincipal() == null) {
+            throw new BusinessException("Usuario no autenticado", 401);
+        }
+        if (auth.getPrincipal() instanceof Integer id) {
+            return id;
+        }
+        try {
+            return Integer.valueOf(auth.getName());
+        } catch (NumberFormatException e) {
+            throw new BusinessException("Usuario no autenticado", 401);
+        }
     }
 }

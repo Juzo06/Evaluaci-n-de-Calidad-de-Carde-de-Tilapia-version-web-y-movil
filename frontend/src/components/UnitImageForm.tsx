@@ -63,13 +63,14 @@ export default function UnitImageForm({ classifiedCount, totalUnits, disabled, i
   }
 
   return (
-    <form className="card" style={{ width: "420px", alignSelf: "flex-start" }} onSubmit={(event) => event.preventDefault()}>
+    <form style={{ display: "flex", flexDirection: "column", gap: "16px" }} onSubmit={(event) => event.preventDefault()}>
       <figure
         className="drop"
         style={{ margin: 0, cursor: disabled ? "not-allowed" : "pointer", opacity: disabled ? 0.6 : 1, borderColor: isDragging ? "#0b4f7a" : undefined }}
         role="button"
         tabIndex={disabled ? -1 : 0}
         aria-disabled={disabled}
+        aria-label="Cargar imagen de muestra"
         onClick={() => !disabled && inputRef.current?.click()}
         onKeyDown={handleDropKeyDown}
         onDragOver={(event) => {
@@ -79,7 +80,7 @@ export default function UnitImageForm({ classifiedCount, totalUnits, disabled, i
         onDragLeave={() => setIsDragging(false)}
         onDrop={handleDrop}
       >
-        <span>
+        <figcaption style={{ fontSize: "inherit", color: "inherit", textAlign: "center" }}>
           {file ? (
             <strong>{file.name}</strong>
           ) : (
@@ -89,9 +90,10 @@ export default function UnitImageForm({ classifiedCount, totalUnits, disabled, i
               JPG o PNG, máximo 5 MB
             </>
           )}
-        </span>
+        </figcaption>
         <input
           ref={inputRef}
+          id="unit-image-file"
           type="file"
           accept="image/jpeg,image/png"
           hidden
@@ -99,13 +101,27 @@ export default function UnitImageForm({ classifiedCount, totalUnits, disabled, i
         />
       </figure>
       {fileError && (
-        <small role="alert" style={errorStyle}>
-          {fileError}
-        </small>
+        <aside role="alert" aria-live="assertive">
+          <small style={errorStyle}>
+            {fileError}
+          </small>
+        </aside>
       )}
-      <small aria-live="polite">
-        Unidades clasificadas: {totalUnits === null ? "-" : classifiedCount} de {totalUnits ?? "-"}
-      </small>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <output aria-live="polite" style={{ fontSize: "12px", color: "#4d6a80" }}>
+          Unidades clasificadas: {totalUnits === null ? "-" : classifiedCount} de {totalUnits ?? "-"}
+        </output>
+        {totalUnits !== null && (
+          <progress
+            value={classifiedCount}
+            max={totalUnits}
+            className="sr-only"
+            aria-label="Progreso de unidades clasificadas"
+          >
+            {classifiedCount} de {totalUnits}
+          </progress>
+        )}
+      </div>
       <button className="o" type="button" disabled={disabled || !file || isUploading} onClick={handleUpload}>
         {isUploading ? "Clasificando..." : "Cargar imagen"}
       </button>

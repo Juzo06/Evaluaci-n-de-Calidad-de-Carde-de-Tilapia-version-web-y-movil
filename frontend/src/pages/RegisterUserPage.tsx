@@ -8,7 +8,7 @@ export default function RegisterUserPage() {
   const [registeredUser, setRegisteredUser] = useState<RegisterUserResponseDTO | null>(null);
 
   /**
-   * Implements submitRegistration from DC-HU1 diagram using apiPost based on fetch.
+   * Implements submitRegistration from DC-HU1 diagram using apiPost.
    */
   async function submitRegistration(request: RegisterUserRequestDTO): Promise<void> {
     const response = await apiPost<RegisterUserRequestDTO, RegisterUserResponseDTO>("/api/users", request);
@@ -23,66 +23,45 @@ export default function RegisterUserPage() {
   }
 
   return (
-    <main className="flex flex-col md:flex-row min-h-screen w-full max-w-full overflow-x-hidden bg-[#f3f8fc]">
-      {/* Responsive navigation: compact top bar on mobile, sidebar on desktop */}
-      <nav
-        className="w-full md:w-60 bg-[#0b4f7a] text-white p-4 md:p-7 flex flex-col gap-2 md:gap-3 flex-shrink-0"
-        aria-label="Menú principal"
+    <main className="min-h-screen w-full flex flex-col md:flex-row bg-white">
+      {/* Panel Izquierdo Azul (Mockup HU-01) */}
+      <aside
+        aria-label="Información del sistema"
+        className="w-full md:w-1/2 bg-[#094b72] text-white p-8 sm:p-12 md:p-16 flex flex-col justify-center min-h-[360px] md:min-h-screen flex-shrink-0"
       >
-        <div className="flex items-center justify-between md:block">
-          <h2 className="text-xl md:text-2xl font-serif md:pb-5 text-white">Calidad de Tilapia</h2>
-          <span className="md:hidden text-xs bg-[#13608f] px-2.5 py-1 rounded-full font-semibold">
-            SECCT
-          </span>
-        </div>
-
-        <div className="flex flex-wrap md:flex-col gap-1.5 pt-2">
-          <a
-            href="#/registro"
-            aria-current="page"
-            className="text-sm px-3.5 py-2.5 rounded-xl transition-colors font-semibold bg-white text-[#0b4f7a]"
-          >
-            Registrar usuario
-          </a>
-          <a
-            href="#/register"
-            className="text-sm px-3.5 py-2.5 rounded-xl transition-colors text-white hover:bg-[#13608f]"
-          >
-            Registrar lote
-          </a>
-          <a
-            href="#/evaluate"
-            className="text-sm px-3.5 py-2.5 rounded-xl transition-colors text-white hover:bg-[#13608f]"
-          >
-            Evaluar lote
-          </a>
-        </div>
-      </nav>
-
-      {/* Main content area: responsive padding without horizontal overflow (PS-04) */}
-      <section className="flex-1 p-4 sm:p-6 md:p-9 flex flex-col gap-5 w-full max-w-full overflow-x-hidden">
-        <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-          <div>
-            <h1 className="text-2xl sm:text-3xl md:text-4xl font-serif text-[#0b3a5a]">
-              Registrar usuario
-            </h1>
-            <p className="text-[#4d6a80] text-sm mt-1">
-              Crea una cuenta para piscicultores y gestiona la trazabilidad de tus lotes.
-            </p>
-          </div>
-          <span className="bg-[#dcebf6] text-[#0b4f7a] text-xs font-semibold px-3 py-1.5 rounded-full flex-shrink-0">
-            Rol: Piscicultor
-          </span>
+        <header className="max-w-md mx-auto md:mx-0 w-full flex flex-col gap-4">
+          <p className="font-serif text-xl sm:text-2xl text-white/90 m-0">
+            Calidad de Tilapia
+          </p>
+          <h1 id="hero-title" className="font-serif font-bold text-4xl sm:text-5xl text-white leading-tight m-0">
+            Evalúa tu cosecha con confianza
+          </h1>
+          <p className="text-white/85 text-base sm:text-lg m-0 mt-2">
+            Registra tus lotes y conoce la calidad de cada unidad.
+          </p>
         </header>
+        <footer className="max-w-md mx-auto md:mx-0 w-full pt-4">
+          <span className="inline-block bg-[#073856] text-white/95 text-xs font-semibold px-4 py-2 rounded-full border border-white/10 shadow-sm">
+            Clasificación NTC 1443
+          </span>
+        </footer>
+      </aside>
 
-        {registeredUser ? (
-          <UserRegistrationResultCard
-            user={registeredUser}
-            onRegisterAnother={() => setRegisteredUser(null)}
-          />
-        ) : (
-          <UserRegistrationForm onSubmit={submitRegistration} />
-        )}
+      {/* Panel Derecho Blanco (Formulario de Registro) */}
+      <section
+        aria-labelledby="form-title"
+        className="w-full md:w-1/2 bg-white p-6 sm:p-10 md:p-16 flex flex-col justify-center items-center min-h-screen"
+      >
+        <div className="w-full max-w-[500px]">
+          {registeredUser ? (
+            <UserRegistrationResultCard
+              user={registeredUser}
+              onRegisterAnother={() => setRegisteredUser(null)}
+            />
+          ) : (
+            <UserRegistrationForm onSubmit={submitRegistration} />
+          )}
+        </div>
       </section>
     </main>
   );

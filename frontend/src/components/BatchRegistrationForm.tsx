@@ -85,21 +85,23 @@ export default function BatchRegistrationForm({ onSubmit }: BatchRegistrationFor
   }
 
   return (
-    <section className="card" style={{ maxWidth: "860px" }}>
+    <section aria-labelledby="register-batch-title" className="card" style={{ maxWidth: "860px" }}>
       <form
         style={{ display: "flex", flexDirection: "column", gap: "16px" }}
         onSubmit={handleSubmit}
         noValidate
       >
         {formError && (
-          <small role="alert" style={errorStyle}>
-            {formError}
-          </small>
+          <aside role="alert" aria-live="assertive">
+            <small style={errorStyle}>{formError}</small>
+          </aside>
         )}
         <fieldset>
-          <label>
+          <legend className="sr-only">Datos del lote</legend>
+          <label htmlFor="captureDate">
             Fecha de captura
             <input
+              id="captureDate"
               type="date"
               placeholder="dd/mm/aaaa"
               name="captureDate"
@@ -111,9 +113,10 @@ export default function BatchRegistrationForm({ onSubmit }: BatchRegistrationFor
             <small id="captureDateHint">No puede ser futura</small>
             {renderError("captureDate")}
           </label>
-          <label>
+          <label htmlFor="weightKg">
             Peso (kg)
             <input
+              id="weightKg"
               type="text"
               placeholder="0,00"
               name="weightKg"
@@ -125,9 +128,10 @@ export default function BatchRegistrationForm({ onSubmit }: BatchRegistrationFor
             <small id="weightKgHint">Mayor que 0, hasta 2 decimales, máx. 10.000,00</small>
             {renderError("weightKg")}
           </label>
-          <label>
+          <label htmlFor="sampleUnitCount">
             Número de unidades de muestra
             <input
+              id="sampleUnitCount"
               type="number"
               placeholder=""
               name="sampleUnitCount"
@@ -140,19 +144,25 @@ export default function BatchRegistrationForm({ onSubmit }: BatchRegistrationFor
             {renderError("sampleUnitCount")}
           </label>
         </fieldset>
-        <label>
-          Observaciones (opcional)
-          <textarea
-            placeholder="Máximo 500 caracteres"
-            name="notes"
-            value={values.notes}
-            onChange={handleChange}
-            aria-invalid={Boolean(errors.notes)}
-            aria-describedby={errors.notes ? "notesError" : undefined}
-          />
-          {renderError("notes")}
-        </label>
-        <small>
+
+        <fieldset style={{ display: "flex", flexDirection: "column", gap: "6px", border: 0, padding: 0, margin: 0 }}>
+          <legend className="sr-only">Observaciones del lote</legend>
+          <label htmlFor="notes">
+            Observaciones (opcional)
+            <textarea
+              id="notes"
+              placeholder="Máximo 500 caracteres"
+              name="notes"
+              value={values.notes}
+              onChange={handleChange}
+              aria-invalid={Boolean(errors.notes)}
+              aria-describedby={errors.notes ? "notesError" : "notesHint"}
+            />
+            {renderError("notes")}
+          </label>
+        </fieldset>
+
+        <small id="notesHint">
           El código del lote (máx. 30 caracteres) lo genera el sistema al guardar. El lote queda en estado ABIERTO,
           disponible para evaluar.
         </small>

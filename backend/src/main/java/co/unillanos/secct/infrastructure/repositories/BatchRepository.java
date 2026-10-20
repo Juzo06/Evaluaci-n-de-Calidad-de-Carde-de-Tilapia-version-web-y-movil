@@ -17,4 +17,6 @@ public interface BatchRepository extends JpaRepository<Batch, Integer> {
     Optional<Batch> findByCodeAndOwnerIdAndIsDeletedFalse(String code, Integer ownerId);
 
     List<Batch> findByOwnerIdAndStatusCodeInAndIsDeletedFalse(Integer ownerId, List<String> statusCodes);
+
+    List<Batch> findByOwnerIdAndStatusCodeAndIsDeletedFalse(Integer ownerId, String statusCode);
 }
