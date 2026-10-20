@@ -100,6 +100,7 @@ export default function EvaluateBatchPage() {
     <main className="app">
       <nav className="side" aria-label="Menú principal">
         <h3 style={{ fontSize: "24px", padding: "0 16px 20px" }}>Calidad de Tilapia</h3>
+        <a href="#/registro">Registrar usuario</a>
         <a href="#/register">Registrar lote</a>
         <a href="#/evaluate" aria-current="page">Evaluar lote</a>
         <a href="m-hu5.html">Lotes evaluados</a>
