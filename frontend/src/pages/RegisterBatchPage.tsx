@@ -20,8 +20,8 @@ export default function RegisterBatchPage() {
     <main className="app">
       <nav className="side" aria-label="Menú principal">
         <h3 style={{ fontSize: "24px", padding: "0 16px 20px" }}>Calidad de Tilapia</h3>
-        <a href="m-hu3.html" aria-current="page">Registrar lote</a>
-        <a href="m-hu4.html">Evaluar lote</a>
+        <a href="#/register" aria-current="page">Registrar lote</a>
+        <a href="#/evaluate">Evaluar lote</a>
         <a href="m-hu5.html">Lotes evaluados</a>
         <a href="m-hu2.html">Cerrar sesión</a>
       </nav>

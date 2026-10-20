@@ -10,6 +10,10 @@ import jakarta.persistence.Table;
 @Table(name = "estado_lote")
 public class BatchStatus {
 
+    public static final String OPEN = "ABIERTO";
+    public static final String IN_EVALUATION = "EN_EVALUACION";
+    public static final String EVALUATED = "EVALUADO";
+
     @Id
     private Short id;
 

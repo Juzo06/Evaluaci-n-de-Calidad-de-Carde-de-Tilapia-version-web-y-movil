@@ -81,6 +81,28 @@ public class Batch {
         this.isDeleted = false;
     }
 
+    /** A batch accepts new evaluated units only while it is ABIERTO or EN_EVALUACION. */
+    public boolean isOpenForEvaluation() {
+        String statusCode = status.getCode();
+        return BatchStatus.OPEN.equals(statusCode) || BatchStatus.IN_EVALUATION.equals(statusCode);
+    }
+
+    /** The first evaluated unit moves the batch from ABIERTO to EN_EVALUACION. */
+    public void startEvaluation(BatchStatus inEvaluation) {
+        if (BatchStatus.OPEN.equals(status.getCode())) {
+            this.status = inEvaluation;
+        }
+    }
+
+    /** Stores the final classification and moves the batch to EVALUADO. */
+    public void close(BigDecimal finalClassification, BatchStatus evaluated) {
+        if (!isOpenForEvaluation()) {
+            throw new IllegalStateException("The batch is already evaluated");
+        }
+        this.finalClassification = finalClassification;
+        this.status = evaluated;
+    }
+
     @PrePersist
     void onCreate() {
         OffsetDateTime now = OffsetDateTime.now();

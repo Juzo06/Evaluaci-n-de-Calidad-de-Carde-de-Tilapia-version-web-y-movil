@@ -12,6 +12,7 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 import java.util.List;
 
@@ -34,6 +35,12 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponseDTO> handleUnreadable(HttpMessageNotReadableException exception) {
         return ResponseEntity.badRequest().body(ErrorResponseDTO.of(
                 "El cuerpo de la solicitud no es válido. Verifica la fecha (AAAA-MM-DD) y los valores numéricos"));
+    }
+
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public ResponseEntity<ErrorResponseDTO> handleTooLarge(MaxUploadSizeExceededException exception) {
+        return ResponseEntity.status(HttpStatus.PAYLOAD_TOO_LARGE).body(ErrorResponseDTO.of(
+                "La imagen supera el tamaño máximo de 5 MB"));
     }
 
     @ExceptionHandler(BusinessException.class)

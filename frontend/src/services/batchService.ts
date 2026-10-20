@@ -1,6 +1,15 @@
 import type { BatchResponseDTO, RegisterBatchRequestDTO } from "../types/batch";
-import { apiPost } from "./apiClient";
+import { apiGet, apiPost } from "./apiClient";
 
 export function registerBatch(request: RegisterBatchRequestDTO): Promise<BatchResponseDTO> {
   return apiPost<RegisterBatchRequestDTO, BatchResponseDTO>("/api/batches", request);
+}
+
+/** Own batches in state ABIERTO or EN_EVALUACION. */
+export function listAvailableBatches(): Promise<BatchResponseDTO[]> {
+  return apiGet<BatchResponseDTO[]>("/api/batches");
+}
+
+export function getBatchByCode(code: string): Promise<BatchResponseDTO> {
+  return apiGet<BatchResponseDTO>(`/api/batches/${encodeURIComponent(code)}`);
 }
