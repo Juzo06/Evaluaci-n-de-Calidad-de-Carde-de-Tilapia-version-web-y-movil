@@ -53,7 +53,7 @@ class JasperReportGeneratorTest {
     }
 
     @Test
-    @DisplayName("PU-24 / PL-12.02: exportPdf genera un PDF valido usando estadisticas congeladas del Report")
+    @DisplayName("PU-24 / PL-12.02: exportPdf genera un PDF valido usando estadisticas consolidadas del Report")
     void exportPdfGeneratesValidPdfFromFrozenReport() {
         Role role = new Role((short) 2, "PISCICULTOR");
         User owner = new User(role, "Ana", "Gomez", "ana@test.com", "3001234567", "hash", "salt");

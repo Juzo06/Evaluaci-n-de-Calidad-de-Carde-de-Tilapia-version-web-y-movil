@@ -79,7 +79,7 @@
                 <textFieldExpression><![CDATA["Generado: " + $P{generatedAt}]]></textFieldExpression>
             </textField>
 
-            <!-- Datos del lote y resumen estadístico congelado -->
+            <!-- Datos del lote y resumen estadístico consolidado -->
             <staticText>
                 <reportElement x="0" y="84" width="515" height="18" forecolor="#003465"/>
                 <textElement verticalAlignment="Middle">
@@ -176,7 +176,7 @@
                 <textElement verticalAlignment="Middle">
                     <font fontName="SansSerif" size="11" isBold="true"/>
                 </textElement>
-                <text><![CDATA[Distribución congelada por categoría NTC 1443 (1 a 5)]]></text>
+                <text><![CDATA[Distribución consolidada por categoría NTC 1443 (1 a 5)]]></text>
             </staticText>
 
             <!-- Cabecera de tabla -->
@@ -198,7 +198,7 @@
                 <textElement textAlignment="Right" verticalAlignment="Middle">
                     <font fontName="SansSerif" size="9" isBold="true"/>
                 </textElement>
-                <text><![CDATA[Puntos registrados]]></text>
+                <text><![CDATA[Unidades registradas]]></text>
             </staticText>
             <staticText>
                 <reportElement x="375" y="504" width="140" height="22" mode="Opaque" backcolor="#094B72" forecolor="#FFFFFF"/>
@@ -376,7 +376,7 @@
                 <textElement textAlignment="Center" verticalAlignment="Middle">
                     <font fontName="SansSerif" size="8"/>
                 </textElement>
-                <text><![CDATA[SECCT · Sistema de Evaluación de Calidad de Carne de Tilapia · Documento generado con estadísticas congeladas]]></text>
+                <text><![CDATA[SECCT · Sistema de Evaluación de Calidad de Carne de Tilapia · Documento generado con estadísticas consolidadas]]></text>
             </staticText>
         </band>
     </title>

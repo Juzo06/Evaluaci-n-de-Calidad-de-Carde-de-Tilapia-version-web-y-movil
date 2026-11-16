@@ -16,7 +16,7 @@ export interface AuthSession {
   fullName?: string;
 }
 
-function extractFullNameFromToken(token: string): string | null {
+function parseTokenPayload(token: string): Record<string, unknown> | null {
   try {
     const parts = token.split(".");
     if (parts.length >= 2) {
@@ -27,13 +27,28 @@ function extractFullNameFromToken(token: string): string | null {
           .map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
           .join("")
       );
-      const parsed = JSON.parse(jsonPayload);
-      if (parsed.fullName && typeof parsed.fullName === "string" && parsed.fullName.trim() !== "") {
-        return parsed.fullName.trim();
-      }
+      return JSON.parse(jsonPayload) as Record<string, unknown>;
     }
   } catch {
-    // ignore
+    // ignore malformed JWT payload
+  }
+  return null;
+}
+
+function extractFullNameFromToken(token: string): string | null {
+  const parsed = parseTokenPayload(token);
+  const fullName = parsed?.fullName;
+  if (typeof fullName === "string" && fullName.trim() !== "") {
+    return fullName.trim();
+  }
+  return null;
+}
+
+function extractRoleCodeFromToken(token: string): string | null {
+  const parsed = parseTokenPayload(token);
+  const roleCode = parsed?.roleCode;
+  if (typeof roleCode === "string" && roleCode.trim() !== "") {
+    return roleCode.trim().toUpperCase();
   }
   return null;
 }
@@ -80,7 +95,19 @@ export function getToken(): string | null {
  * Retrieves the stored role code (PISCICULTOR / ADMINISTRADOR).
  */
 export function getRoleCode(): string | null {
-  return localStorage.getItem(ROLE_KEY);
+  const stored = localStorage.getItem(ROLE_KEY);
+  if (stored && stored.trim() !== "") {
+    return stored.trim().toUpperCase();
+  }
+  const token = getToken();
+  if (token) {
+    const fromToken = extractRoleCodeFromToken(token);
+    if (fromToken) {
+      localStorage.setItem(ROLE_KEY, fromToken);
+      return fromToken;
+    }
+  }
+  return null;
 }
 
 /**

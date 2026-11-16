@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import SideNav from "../components/SideNav";
 import { useI18n } from "../i18n/I18nContext";
-import { formatUnitsCount, localizeErrorMessage } from "../i18n/translations";
+import { formatUnitsCount, localizeErrorMessage, type Locale } from "../i18n/translations";
 import { ApiError } from "../services/apiClient";
 import { getUserFullName } from "../services/authStorage";
 import {
@@ -26,16 +26,22 @@ function formatDecimal(value: number | null | undefined): string {
   }).format(Number(value));
 }
 
-function formatDateTime(iso: string): string {
+function formatDateTime(iso: string, locale: Locale = "es"): string {
   const date = new Date(iso);
   if (Number.isNaN(date.getTime())) {
     return iso;
   }
-  return new Intl.DateTimeFormat("es-CO", {
-    dateStyle: "short",
-    timeStyle: "short",
+  return new Intl.DateTimeFormat(locale === "en" ? "en-US" : "es-CO", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
   }).format(date);
 }
+
+type DeletedNotice = { version: number; code: string } | "generic";
 
 /**
  * HU-11 / HU-12 / HU-14: Saved report history list, frozen version inspection, PDF export, and logical deletion.
@@ -54,7 +60,7 @@ export default function SavedReportsPage() {
   const [isDeleting, setIsDeleting] = useState<boolean>(false);
 
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [statusMessage, setStatusMessage] = useState<string | null>(null);
+  const [deletedNotice, setDeletedNotice] = useState<DeletedNotice | null>(null);
 
   const userFullName = getUserFullName();
 
@@ -146,7 +152,7 @@ export default function SavedReportsPage() {
   async function deleteReport(id: number): Promise<void> {
     setIsDeleting(true);
     setErrorMessage(null);
-    setStatusMessage(null);
+    setDeletedNotice(null);
     try {
       await requestDeleteReport(id);
       const deletedItem = reportToDelete;
@@ -155,13 +161,10 @@ export default function SavedReportsPage() {
         setSelectedReport(null);
         setSelectedSummary(null);
       }
-      setStatusMessage(
+      setDeletedNotice(
         deletedItem
-          ? t("savedReports.deleteSuccessItem", {
-              version: deletedItem.version,
-              code: deletedItem.batchCode,
-            })
-          : t("savedReports.deleteSuccess"),
+          ? { version: deletedItem.version, code: deletedItem.batchCode }
+          : "generic",
       );
       await loadSavedReports();
     } catch (error) {
@@ -227,17 +230,22 @@ export default function SavedReportsPage() {
           </div>
         )}
 
-        {statusMessage && (
+        {deletedNotice && (
           <div role="status" aria-live="polite" className="rounded-xl border border-[#8fb0c9] bg-[#e6eff6] px-4 py-3 text-sm text-[#094b72] font-semibold">
-            {statusMessage}
+            {deletedNotice === "generic"
+              ? t("savedReports.successDelete")
+              : t("savedReports.deleteSuccessItem", {
+                  version: deletedNotice.version,
+                  code: deletedNotice.code,
+                })}
           </div>
         )}
 
-        <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 max-w-6xl items-start">
+        <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 w-full min-w-0 max-w-6xl items-start">
           <section
             aria-labelledby="saved-reports-list-heading"
             aria-live="polite"
-            className="xl:col-span-7 card p-5 sm:p-6 rounded-2xl bg-white border border-[#d5e3ee] shadow-sm flex flex-col gap-4"
+            className="xl:col-span-7 min-w-0 w-full card p-4 sm:p-6 rounded-2xl bg-white border border-[#d5e3ee] shadow-sm flex flex-col gap-4"
           >
             <header>
               <h2 id="saved-reports-list-heading" className="text-xl font-serif text-[#0b3a5a] m-0">
@@ -276,18 +284,16 @@ export default function SavedReportsPage() {
               </section>
             ) : (
               <div className="w-full max-w-full overflow-x-auto">
-                <table className="w-full text-left" id="saved-reports-table">
+                <table className="w-full table-auto text-left" id="saved-reports-table">
                   <caption className="sr-only">
                     {t("savedReports.tableCaption")}
                   </caption>
                   <thead>
                     <tr>
-                      <th scope="col" className="px-2.5 py-2.5 text-xs whitespace-nowrap">{t("savedReports.col.batch")}</th>
-                      <th scope="col" className="px-2.5 py-2.5 text-xs whitespace-nowrap">{t("savedReports.col.version")}</th>
-                      <th scope="col" className="px-2.5 py-2.5 text-xs whitespace-nowrap">{t("savedReports.col.validity")}</th>
-                      <th scope="col" className="px-2.5 py-2.5 text-xs whitespace-nowrap">{t("savedReports.col.final")}</th>
-                      <th scope="col" className="px-2.5 py-2.5 text-xs whitespace-nowrap">{t("savedReports.col.date")}</th>
-                      <th scope="col" className="px-2.5 py-2.5 text-xs whitespace-nowrap text-right">{t("savedReports.col.actions")}</th>
+                      <th scope="col" className="px-2 py-2.5 text-xs">{t("savedReports.col.batch")}</th>
+                      <th scope="col" className="px-2 py-2.5 text-xs whitespace-nowrap">{t("savedReports.col.validity")}</th>
+                      <th scope="col" className="px-2 py-2.5 text-xs whitespace-nowrap">{t("savedReports.col.final")}</th>
+                      <th scope="col" className="px-2 py-2.5 text-xs whitespace-nowrap text-right">{t("savedReports.col.actions")}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -298,13 +304,20 @@ export default function SavedReportsPage() {
                           key={item.id}
                           className={isActive ? "bg-[#f0f6fb]" : "hover:bg-slate-50/80 transition-colors"}
                         >
-                          <td className="px-2.5 py-3 text-xs sm:text-sm font-semibold text-[#0b4f7a] whitespace-nowrap">
-                            {item.batchCode}
-                          </td>
-                          <td className="px-2.5 py-3 text-xs sm:text-sm whitespace-nowrap">v{item.version}</td>
-                          <td className="px-2.5 py-3 text-xs whitespace-nowrap">
+                          <td className="px-2 py-2.5 text-xs min-w-0 max-w-[155px] sm:max-w-[200px]">
                             <span
-                              className={`px-2.5 py-0.5 rounded-full text-xs font-semibold inline-block ${
+                              className="block font-semibold text-[#0b4f7a] truncate"
+                              title={item.batchCode}
+                            >
+                              {item.batchCode}
+                            </span>
+                            <span className="block text-[11px] text-[#4d6a80] mt-0.5">
+                              v{item.version} · <time dateTime={item.generatedAt}>{formatDateTime(item.generatedAt, locale)}</time>
+                            </span>
+                          </td>
+                          <td className="px-2 py-2.5 text-xs whitespace-nowrap">
+                            <span
+                              className={`px-2 py-0.5 rounded-full text-[11px] font-semibold inline-block ${
                                 item.current
                                   ? "bg-[#e0edf7] text-[#094b72]"
                                   : "bg-slate-100 text-slate-600"
@@ -313,14 +326,11 @@ export default function SavedReportsPage() {
                               {item.current ? t("savedReports.current") : t("savedReports.previous")}
                             </span>
                           </td>
-                          <td className="px-2.5 py-3 text-xs sm:text-sm font-semibold text-[#0b3a5a] whitespace-nowrap">
+                          <td className="px-2 py-2.5 text-xs sm:text-sm font-semibold text-[#0b3a5a] whitespace-nowrap">
                             {formatDecimal(item.finalClassification)}
                           </td>
-                          <td className="px-2.5 py-3 text-xs whitespace-nowrap text-[#4d6a80]">
-                            <time dateTime={item.generatedAt}>{formatDateTime(item.generatedAt)}</time>
-                          </td>
-                          <td className="px-2.5 py-3 text-right whitespace-nowrap">
-                            <div className="inline-flex items-center gap-2">
+                          <td className="px-2 py-2.5 text-right">
+                            <div className="flex flex-wrap items-center justify-end gap-x-2.5 gap-y-1">
                               <button
                                 type="button"
                                 onClick={() => void openReport(item.id)}
@@ -328,11 +338,10 @@ export default function SavedReportsPage() {
                                   version: item.version,
                                   code: item.batchCode,
                                 })}
-                                className="text-xs font-semibold text-[#0b4f7a] hover:underline bg-transparent border-0 p-0 cursor-pointer"
+                                className="text-xs font-semibold text-[#0b4f7a] hover:underline bg-transparent border-0 p-0 cursor-pointer whitespace-nowrap"
                               >
                                 {t("savedReports.view")}
                               </button>
-                              <span aria-hidden="true" className="text-[#8fb0c9]">·</span>
                               <button
                                 type="button"
                                 onClick={() => void exportReportPdf(item.id)}
@@ -341,23 +350,22 @@ export default function SavedReportsPage() {
                                   version: item.version,
                                   code: item.batchCode,
                                 })}
-                                className="text-xs font-semibold text-[#094b72] hover:underline bg-transparent border-0 p-0 cursor-pointer disabled:opacity-50"
+                                className="text-xs font-semibold text-[#094b72] hover:underline bg-transparent border-0 p-0 cursor-pointer disabled:opacity-50 whitespace-nowrap"
                               >
                                 {isExportingId === item.id ? t("savedReports.exporting") : t("savedReports.exportPdf")}
                               </button>
-                              <span aria-hidden="true" className="text-[#8fb0c9]">·</span>
                               <button
                                 type="button"
                                 onClick={() => {
                                   setReportToDelete(item);
-                                  setStatusMessage(null);
+                                  setDeletedNotice(null);
                                   setErrorMessage(null);
                                 }}
                                 aria-label={t("savedReports.deleteAria", {
                                   version: item.version,
                                   code: item.batchCode,
                                 })}
-                                className="text-xs font-semibold text-[#b42318] hover:underline bg-transparent border-0 p-0 cursor-pointer"
+                                className="text-xs font-semibold text-[#b42318] hover:underline bg-transparent border-0 p-0 cursor-pointer whitespace-nowrap"
                               >
                                 {t("savedReports.delete")}
                               </button>
@@ -375,7 +383,7 @@ export default function SavedReportsPage() {
           <section
             aria-labelledby="saved-report-detail-heading"
             aria-live="polite"
-            className="xl:col-span-5 card p-5 sm:p-6 rounded-2xl bg-white border border-[#d5e3ee] shadow-sm flex flex-col gap-4"
+            className="xl:col-span-5 min-w-0 w-full card p-4 sm:p-6 rounded-2xl bg-white border border-[#d5e3ee] shadow-sm flex flex-col gap-4"
           >
             <header className="flex flex-wrap items-start justify-between gap-2">
               <h2 id="saved-report-detail-heading" className="text-xl font-serif text-[#0b3a5a] m-0">
@@ -388,7 +396,7 @@ export default function SavedReportsPage() {
               </h2>
               {selectedSummary && (
                 <span className="tag text-[#094b72]">
-                  {selectedSummary.current ? t("savedReports.current") : t("savedReports.previous")} · {formatDateTime(selectedSummary.generatedAt)}
+                  {selectedSummary.current ? t("savedReports.current") : t("savedReports.previous")} · {formatDateTime(selectedSummary.generatedAt, locale)}
                 </span>
               )}
             </header>

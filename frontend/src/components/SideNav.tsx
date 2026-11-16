@@ -77,38 +77,21 @@ export default function SideNav({ current }: SideNavProps) {
         <nav aria-label={t("nav.mainAria")}>
           <ul className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap md:flex-col md:space-y-2 p-0 m-0 list-none">
             {roleCode === "ADMINISTRADOR" ? (
-              <>
-                <li className="m-0 p-0">
-                  <a
-                    href="#/admin"
-                    id="nav-admin-link"
-                    aria-current={current === "admin" ? "page" : undefined}
-                    style={getLinkStyle(current === "admin")}
-                    className={`block w-full text-center md:text-left px-2.5 py-2.5 sm:px-4 sm:py-3 rounded-xl text-xs sm:text-sm transition-colors ${
-                      current === "admin"
-                        ? "bg-white font-semibold shadow-sm"
-                        : "hover:bg-white/10"
-                    }`}
-                  >
-                    {t("nav.adminMonitoring")}
-                  </a>
-                </li>
-                <li className="m-0 p-0">
-                  <a
-                    href="#/registro"
-                    id="nav-registro-link"
-                    aria-current={current === "registro" ? "page" : undefined}
-                    style={getLinkStyle(current === "registro")}
-                    className={`block w-full text-center md:text-left px-2.5 py-2.5 sm:px-4 sm:py-3 rounded-xl text-xs sm:text-sm transition-colors ${
-                      current === "registro"
-                        ? "bg-white font-semibold shadow-sm"
-                        : "hover:bg-white/10"
-                    }`}
-                  >
-                    {t("nav.registerUser")}
-                  </a>
-                </li>
-              </>
+              <li className="m-0 p-0">
+                <a
+                  href="#/admin"
+                  id="nav-admin-link"
+                  aria-current={current === "admin" ? "page" : undefined}
+                  style={getLinkStyle(current === "admin")}
+                  className={`block w-full text-center md:text-left px-2.5 py-2.5 sm:px-4 sm:py-3 rounded-xl text-xs sm:text-sm transition-colors ${
+                    current === "admin"
+                      ? "bg-white font-semibold shadow-sm"
+                      : "hover:bg-white/10"
+                  }`}
+                >
+                  {t("nav.adminMonitoring")}
+                </a>
+              </li>
             ) : (
               <>
                 <li className="m-0 p-0">

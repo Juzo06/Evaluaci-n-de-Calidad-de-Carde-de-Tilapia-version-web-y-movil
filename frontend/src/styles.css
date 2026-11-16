@@ -1,4 +1,4 @@
-body{margin:0;font-family:'DM Sans',sans-serif;color:#0b3a5a}*{box-sizing:border-box}
+body{margin:0;font-family:'DM Sans',sans-serif;color:#0b3a5a;padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px)}*{box-sizing:border-box}
 h1,h2,h3{font-family:'Fraunces',serif;margin:0}a{color:#0b4f7a}
 label{display:flex;flex-direction:column;gap:6px;font-size:14px}
 input,select,textarea{height:48px;border:1px solid #8fb0c9;border-radius:12px;padding:0 14px;font:inherit;background:#fff;color:#0b3a5a}
@@ -6,6 +6,7 @@ textarea{height:84px;padding:12px 14px}small{color:#4d6a80;font-size:12px}
 fieldset{border:0;padding:0;margin:0;display:grid;grid-template-columns:1fr 1fr;gap:16px}
 .p{background:#0b4f7a;color:#fff;border:0;border-radius:12px;height:52px;font:600 16px 'DM Sans',sans-serif;padding:0 24px}
 .o{background:#fff;color:#0b4f7a;border:1.5px solid #0b4f7a;border-radius:12px;height:52px;font:600 16px 'DM Sans',sans-serif;padding:0 24px}
+.p:disabled,.o:disabled{opacity:0.45;cursor:not-allowed}
 .split{display:flex;min-height:720px}
 .brand{width:50%;background:#0b4f7a;color:#fff;padding:72px;display:flex;flex-direction:column;justify-content:center;gap:20px}
 .brand h2{font-size:48px;line-height:1.1}
@@ -36,3 +37,4 @@ html.a11y-high-contrast .side,html.a11y-high-contrast aside:not([aria-label="Her
 html.a11y-high-contrast .side a[aria-current],html.a11y-high-contrast aside:not([aria-label="Herramientas de accesibilidad"]):not(#a11y-widget-root) a[aria-current]{background-color:#fff!important;color:#000!important;outline:2px solid #000}
 html.a11y-high-contrast *:focus-visible{outline:3px solid #000!important;outline-offset:2px}
 html.a11y-reduce-motion *,html.a11y-reduce-motion *::before,html.a11y-reduce-motion *::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
+@media (max-width:767px){aside:not(#a11y-widget-root){padding-top:calc(1.25rem + env(safe-area-inset-top,0px))}#main-content{padding-bottom:calc(4.75rem + env(safe-area-inset-bottom,0px))}}

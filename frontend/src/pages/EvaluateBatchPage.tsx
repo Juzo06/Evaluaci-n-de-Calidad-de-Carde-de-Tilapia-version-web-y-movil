@@ -103,6 +103,9 @@ export default function EvaluateBatchPage() {
   }
 
   async function closeEvaluation(code: string): Promise<void> {
+    if (isClosing || closedBatch !== null) {
+      return;
+    }
     setPageError(null);
     setIsClosing(true);
     try {

@@ -19,7 +19,7 @@ export default function BatchResultCard({ batch, onRegisterAnother }: BatchResul
       <header>
         <h2 className="text-xl sm:text-2xl font-serif">{t("batchCard.title")}</h2>
       </header>
-      <dl className="grid grid-cols-1 sm:grid-cols-[max-content_1fr] gap-2 sm:gap-x-4 sm:gap-y-2 m-0 text-sm">
+      <dl className="grid grid-cols-1 sm:grid-cols-[max-content_minmax(0,1fr)] gap-2 sm:gap-x-4 sm:gap-y-2 m-0 text-sm">
         <dt style={{ color: "#4d6a80" }}>{t("batchCard.code")}</dt>
         <dd style={{ margin: 0 }}><strong>{batch.code}</strong></dd>
         <dt style={{ color: "#4d6a80" }}>{t("batchCard.captureDate")}</dt>
@@ -31,7 +31,7 @@ export default function BatchResultCard({ batch, onRegisterAnother }: BatchResul
         {batch.notes && (
           <>
             <dt style={{ color: "#4d6a80" }}>{t("batchCard.notes")}</dt>
-            <dd style={{ margin: 0 }} className="break-words">{batch.notes}</dd>
+            <dd style={{ margin: 0 }} className="min-w-0 break-words [overflow-wrap:anywhere]">{batch.notes}</dd>
           </>
         )}
         <dt style={{ color: "#4d6a80" }}>{t("batchCard.status")}</dt>

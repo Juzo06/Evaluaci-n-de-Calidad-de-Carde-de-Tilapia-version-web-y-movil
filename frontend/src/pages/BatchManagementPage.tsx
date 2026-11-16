@@ -31,7 +31,7 @@ export default function BatchManagementPage() {
   const [batches, setBatches] = useState<BatchResponseDTO[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [statusMessage, setStatusMessage] = useState<string | null>(null);
+  const [deletedBatchCode, setDeletedBatchCode] = useState<string | null>(null);
   const [batchToDelete, setBatchToDelete] = useState<BatchResponseDTO | null>(null);
   const [isDeleting, setIsDeleting] = useState<boolean>(false);
   const userFullName = getUserFullName();
@@ -66,11 +66,11 @@ export default function BatchManagementPage() {
   async function deleteBatch(code: string): Promise<void> {
     setIsDeleting(true);
     setErrorMessage(null);
-    setStatusMessage(null);
+    setDeletedBatchCode(null);
     try {
       await requestDeleteBatch(code);
       setBatchToDelete(null);
-      setStatusMessage(t("manage.deleteSuccess", { code }));
+      setDeletedBatchCode(code);
       await loadBatches();
     } catch (error) {
       const msg =
@@ -114,9 +114,9 @@ export default function BatchManagementPage() {
           </div>
         )}
 
-        {statusMessage && (
+        {deletedBatchCode && (
           <div role="status" aria-live="polite" className="rounded-xl border border-[#8fb0c9] bg-[#e6eff6] px-4 py-3 text-sm text-[#094b72] font-semibold">
-            {statusMessage}
+            {t("batchManagement.successDelete", { code: deletedBatchCode })}
           </div>
         )}
 
@@ -182,7 +182,7 @@ export default function BatchManagementPage() {
                             type="button"
                             onClick={() => {
                               setBatchToDelete(batch);
-                              setStatusMessage(null);
+                              setDeletedBatchCode(null);
                               setErrorMessage(null);
                             }}
                             aria-label={t("manage.deleteAria", { code: batch.code })}

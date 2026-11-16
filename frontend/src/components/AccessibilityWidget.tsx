@@ -109,6 +109,7 @@ export default function AccessibilityWidget() {
     <aside
       id="a11y-widget-root"
       aria-label={t("a11y.toolsAria")}
+      style={{ bottom: "calc(1rem + env(safe-area-inset-bottom, 0px))" }}
       className="fixed bottom-4 right-4 z-50 flex flex-col items-end gap-2 font-['Inter',sans-serif]"
     >
       {isOpen && (
