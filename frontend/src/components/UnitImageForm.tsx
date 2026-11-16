@@ -128,7 +128,12 @@ export default function UnitImageForm({ classifiedCount, totalUnits, disabled, i
           </progress>
         </div>
       )}
-      <button className="o w-full sm:w-auto" type="button" disabled={disabled || !file || isUploading} onClick={handleUpload}>
+      <button
+        className={`${file !== null && !isUploading && !disabled ? "p cursor-pointer" : "o"} w-full sm:w-auto`}
+        type="button"
+        disabled={disabled || !file || isUploading}
+        onClick={handleUpload}
+      >
         {isUploading ? t("unitForm.uploading") : t("unitForm.upload")}
       </button>
     </form>

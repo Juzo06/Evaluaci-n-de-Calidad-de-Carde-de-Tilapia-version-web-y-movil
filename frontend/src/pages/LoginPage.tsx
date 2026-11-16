@@ -7,6 +7,7 @@ import {
   saveSession,
   removeLocalToken as clearStoredSession,
 } from "../services/authStorage";
+import { isMobileApp } from "../services/platform";
 import { validateLoginForm, LoginFormErrors } from "../validation/authValidation";
 
 /**
@@ -20,6 +21,7 @@ export default function LoginPage() {
   const [errors, setErrors] = useState<LoginFormErrors>({});
   const [apiError, setApiError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const mobileMode = isMobileApp();
 
   // DC-HU2 explicit method: removeLocalToken(): void
   const removeLocalToken = (): void => {
@@ -32,6 +34,13 @@ export default function LoginPage() {
 
   // DC-HU2 explicit method: showLoginResult(response: LoginResponseDTO): void
   const showLoginResult = (response: LoginResponseDTO): void => {
+    if (mobileMode && response.roleCode?.trim().toUpperCase() === "ADMINISTRADOR") {
+      removeLocalToken();
+      setIsSubmitting(false);
+      setApiError(t("admin.accessDenied"));
+      return;
+    }
+
     saveSession(response);
 
     // PL-2.13 & PL-2.14: replace browser history to prevent navigation back to login
@@ -83,24 +92,24 @@ export default function LoginPage() {
   };
 
   return (
-    <main id="main-content" className="min-h-screen w-full flex flex-col md:flex-row bg-white">
+    <main id="main-content" className="min-h-dvh w-full flex flex-col md:flex-row bg-white">
       {/* Panel Izquierdo Azul (Mockup HU-02) */}
       <aside
         aria-label={t("auth.systemInfoAria")}
-        className="w-full md:w-1/2 bg-[#094b72] text-white p-8 sm:p-12 md:p-16 flex flex-col justify-center min-h-[360px] md:min-h-screen flex-shrink-0"
+        className="w-full md:w-1/2 bg-[#094b72] text-white pt-[calc(1.25rem+env(safe-area-inset-top,0px))] pb-5 px-5 sm:p-10 md:p-16 flex flex-col justify-center md:min-h-screen flex-shrink-0"
       >
-        <header className="max-w-md mx-auto md:mx-0 w-full flex flex-col gap-4">
-          <p className="font-serif text-xl sm:text-2xl text-white/90 m-0">
+        <header className="max-w-md mx-auto md:mx-0 w-full flex flex-col gap-1.5 sm:gap-3">
+          <p className="font-serif text-base sm:text-xl md:text-2xl text-white/90 m-0">
             {t("auth.brandName")}
           </p>
-          <h1 id="hero-title" className="font-serif font-bold text-4xl sm:text-5xl text-white leading-tight m-0">
+          <h1 id="hero-title" className="font-serif font-bold text-2xl sm:text-4xl md:text-5xl text-white leading-tight m-0">
             {t("auth.login.heroTitle")}
           </h1>
-          <p className="text-white/85 text-base sm:text-lg m-0 mt-2">
+          <p className="hidden sm:block text-white/85 text-base sm:text-lg m-0 mt-1">
             {t("auth.login.heroSubtitle")}
           </p>
         </header>
-        <footer className="max-w-md mx-auto md:mx-0 w-full pt-4">
+        <footer className="hidden sm:block max-w-md mx-auto md:mx-0 w-full pt-4">
           <span className="inline-block bg-[#073856] text-white/95 text-xs font-semibold px-4 py-2 rounded-full border border-white/10 shadow-sm">
             {t("auth.badgeNtc")}
           </span>
@@ -110,11 +119,11 @@ export default function LoginPage() {
       {/* Panel Derecho Blanco (Formulario de Inicio de Sesión) */}
       <section
         aria-labelledby="form-title"
-        className="w-full md:w-1/2 bg-white p-6 sm:p-10 md:p-16 flex flex-col justify-center items-center min-h-screen"
+        className="w-full md:w-1/2 bg-white py-6 px-5 sm:p-10 md:p-16 flex flex-col justify-center items-center flex-1 md:min-h-screen"
       >
         <div className="w-full max-w-[420px]">
-          <header className="mb-8 flex items-center justify-between gap-3">
-            <h2 id="form-title" className="text-3xl sm:text-4xl font-serif font-bold text-[#0d3b66] m-0">
+          <header className="mb-5 sm:mb-8 flex items-center justify-between gap-3">
+            <h2 id="form-title" className="text-2xl sm:text-3xl md:text-4xl font-serif font-bold text-[#0d3b66] m-0">
               {t("auth.login.formTitle")}
             </h2>
             <div
@@ -269,16 +278,18 @@ export default function LoginPage() {
 
             {/* Enlace inferior y nota al pie agrupados en footer */}
             <footer className="flex flex-col gap-4 mt-2">
-              <div className="text-center text-sm text-[#5b738b]">
-                {t("auth.login.noAccount")}{" "}
-                <a
-                  href="#/registro"
-                  id="login-to-register-link"
-                  className="text-[#094b72] font-semibold underline underline-offset-4 hover:text-[#073a5a]"
-                >
-                  {t("auth.login.registerLink")}
-                </a>
-              </div>
+              {!mobileMode && (
+                <div className="text-center text-sm text-[#5b738b]">
+                  {t("auth.login.noAccount")}{" "}
+                  <a
+                    href="#/registro"
+                    id="login-to-register-link"
+                    className="text-[#094b72] font-semibold underline underline-offset-4 hover:text-[#073a5a]"
+                  >
+                    {t("auth.login.registerLink")}
+                  </a>
+                </div>
+              )}
 
               <p className="text-xs text-[#4d6a80] text-center m-0 leading-relaxed">
                 {t("auth.login.roleNotice")}

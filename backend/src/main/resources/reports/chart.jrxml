@@ -28,7 +28,7 @@
                 <categoryDataset>
                     <dataset resetType="Report"/>
                     <categorySeries>
-                        <seriesExpression><![CDATA["Puntos evaluados"]]></seriesExpression>
+                        <seriesExpression><![CDATA["Unidades registradas"]]></seriesExpression>
                         <categoryExpression><![CDATA[$F{categoryLabel}]]></categoryExpression>
                         <valueExpression><![CDATA[$F{unitCount}]]></valueExpression>
                     </categorySeries>

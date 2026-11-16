@@ -209,18 +209,15 @@ export default function AdminPage() {
                 <thead>
                   <tr>
                     <th scope="col" className="px-3 py-3 text-xs whitespace-nowrap">{t("admin.col.indicator")}</th>
-                    <th scope="col" className="px-3 py-3 text-xs">{t("admin.col.rule")}</th>
                     <th scope="col" className="px-3 py-3 text-xs whitespace-nowrap text-right">{t("admin.col.total")}</th>
                     <th scope="col" className="px-3 py-3 text-xs whitespace-nowrap text-center">{t("admin.col.status")}</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr>
-                    <td className="px-3 py-3 text-xs sm:text-sm font-semibold text-[#0b3a5a]">
-                      {t("admin.row.usersName")}
-                    </td>
-                    <td className="px-3 py-3 text-xs sm:text-sm text-[#4d6a80]">
-                      {t("admin.row.usersRule")}
+                    <td className="px-3 py-3 text-xs sm:text-sm">
+                      <span className="block font-semibold text-[#0b3a5a]">{t("admin.row.usersName")}</span>
+                      <span className="block text-xs text-[#4d6a80] mt-0.5">{t("admin.row.usersDesc")}</span>
                     </td>
                     <td className="px-3 py-3 text-xs sm:text-sm font-bold text-[#094b72] text-right whitespace-nowrap">
                       {systemInfo ? formatCount(systemInfo.totalUsers) : "0"}
@@ -230,11 +227,9 @@ export default function AdminPage() {
                     </td>
                   </tr>
                   <tr>
-                    <td className="px-3 py-3 text-xs sm:text-sm font-semibold text-[#0b3a5a]">
-                      {t("admin.row.batchesName")}
-                    </td>
-                    <td className="px-3 py-3 text-xs sm:text-sm text-[#4d6a80]">
-                      {t("admin.row.batchesRule")}
+                    <td className="px-3 py-3 text-xs sm:text-sm">
+                      <span className="block font-semibold text-[#0b3a5a]">{t("admin.row.batchesName")}</span>
+                      <span className="block text-xs text-[#4d6a80] mt-0.5">{t("admin.row.batchesDesc")}</span>
                     </td>
                     <td className="px-3 py-3 text-xs sm:text-sm font-bold text-[#094b72] text-right whitespace-nowrap">
                       {systemInfo ? formatCount(systemInfo.totalBatches) : "0"}
@@ -244,11 +239,9 @@ export default function AdminPage() {
                     </td>
                   </tr>
                   <tr>
-                    <td className="px-3 py-3 text-xs sm:text-sm font-semibold text-[#0b3a5a]">
-                      {t("admin.row.evalsName")}
-                    </td>
-                    <td className="px-3 py-3 text-xs sm:text-sm text-[#4d6a80]">
-                      {t("admin.row.evalsRule")}
+                    <td className="px-3 py-3 text-xs sm:text-sm">
+                      <span className="block font-semibold text-[#0b3a5a]">{t("admin.row.evalsName")}</span>
+                      <span className="block text-xs text-[#4d6a80] mt-0.5">{t("admin.row.evalsDesc")}</span>
                     </td>
                     <td className="px-3 py-3 text-xs sm:text-sm font-bold text-[#094b72] text-right whitespace-nowrap">
                       {systemInfo ? formatCount(systemInfo.totalEvaluations) : "0"}
@@ -267,12 +260,6 @@ export default function AdminPage() {
               {t("admin.footerNote")}
             </p>
             <div className="flex flex-wrap gap-3">
-              <a
-                href="#/registro"
-                className="o inline-flex items-center justify-center text-sm no-underline px-4 h-11 rounded-xl"
-              >
-                {t("admin.registerNewUser")}
-              </a>
               <button
                 type="button"
                 id="refresh-system-info-button"

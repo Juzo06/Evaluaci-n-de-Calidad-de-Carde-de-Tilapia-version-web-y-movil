@@ -87,11 +87,18 @@ export default function UnitResultsCard({ rows, canClose, isClosing, closedBatch
             {t("unitResults.closeHint")}
           </p>
         )}
-        <div className="row flex flex-col sm:flex-row justify-end">
-          <button className="p w-full sm:w-auto" type="button" disabled={!canClose || isClosing} onClick={onClose}>
-            {isClosing ? t("unitResults.closing") : t("unitResults.closeButton")}
-          </button>
-        </div>
+        {!closedBatch && (
+          <div className="row flex flex-col sm:flex-row justify-end">
+            <button
+              className="p w-full sm:w-auto disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+              type="button"
+              disabled={!canClose || isClosing}
+              onClick={onClose}
+            >
+              {isClosing ? t("unitResults.closing") : t("unitResults.closeButton")}
+            </button>
+          </div>
+        )}
       </footer>
     </article>
   );

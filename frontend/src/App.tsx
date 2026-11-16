@@ -11,7 +11,7 @@ import RegisterBatchPage from "./pages/RegisterBatchPage";
 import RegisterUserPage from "./pages/RegisterUserPage";
 import ReportPage from "./pages/ReportPage";
 import SavedReportsPage from "./pages/SavedReportsPage";
-import { getRoleCode, isAuthenticated } from "./services/authStorage";
+import { getRoleCode, isAuthenticated, removeLocalToken } from "./services/authStorage";
 import { isMobileApp } from "./services/platform";
 
 type Route =
@@ -69,7 +69,10 @@ function getCurrentRoute(): Route {
   if (!isAuthenticated()) {
     return "login";
   }
-  return getRoleCode() === "ADMINISTRADOR" ? "admin" : "registerBatch";
+  if (getRoleCode() === "ADMINISTRADOR") {
+    return isMobileApp() ? "login" : "admin";
+  }
+  return "registerBatch";
 }
 
 function isProtectedRoute(route: Route): boolean {
@@ -87,12 +90,30 @@ function renderCurrentPage(route: Route) {
     return <LoginPage />;
   }
 
+  const role = getRoleCode();
+
+  // In mobile APK, administrators cannot access monitoring or piscicultor flows
+  if (auth && isMobileApp() && role === "ADMINISTRADOR") {
+    removeLocalToken();
+    if (window.location.hash !== "#/login") {
+      window.location.replace("#/login");
+    }
+    return <LoginPage />;
+  }
+
+  // On desktop web, lock authenticated ADMINISTRADOR strictly to #/admin monitoring view
+  if (auth && !isMobileApp() && role === "ADMINISTRADOR") {
+    if (route !== "admin" || window.location.hash !== "#/admin") {
+      window.location.replace("#/admin");
+    }
+    return <AdminPage />;
+  }
+
   // If already authenticated and on login page, redirect to role home
   if (auth && route === "login") {
-    const role = getRoleCode();
-    const destination = role === "ADMINISTRADOR" ? "#/admin" : "#/register";
+    const destination = "#/register";
     window.location.replace(destination);
-    return role === "ADMINISTRADOR" ? <AdminPage /> : <RegisterBatchPage />;
+    return <RegisterBatchPage />;
   }
 
   if (route === "login") {
@@ -101,7 +122,8 @@ function renderCurrentPage(route: Route) {
 
   if (
     isMobileApp() &&
-    (route === "batchManagement" ||
+    (route === "admin" ||
+      route === "batchManagement" ||
       route === "savedReports" ||
       route === "profile" ||
       route === "registro")

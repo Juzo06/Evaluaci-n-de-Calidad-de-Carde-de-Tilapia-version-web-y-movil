@@ -9,6 +9,7 @@ import {
 import { ApiError } from "../services/apiClient";
 import { getUserFullName } from "../services/authStorage";
 import { getBatchByCode } from "../services/batchService";
+import { isMobileApp } from "../services/platform";
 import {
   downloadReportPdf,
   getBatchReport,
@@ -99,6 +100,7 @@ export default function ReportPage() {
   const [isExporting, setIsExporting] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const userFullName = getUserFullName();
+  const mobileMode = isMobileApp();
 
   /** Implements showReport(response) from DS-HU6 and DS-HU11. */
   function showReport(response: ReportResponseDTO): void {
@@ -217,13 +219,17 @@ export default function ReportPage() {
       return;
     }
     if (target.mode === "saved" && target.reportId) {
+      if (mobileMode) {
+        window.location.replace("#/evaluados");
+        return;
+      }
       void openReport(target.reportId);
       return;
     }
     setIsLoading(false);
     setReport(null);
     setErrorMessage(t("report.invalidTarget"));
-  }, [target.mode, target.code, target.status, target.reportId]);
+  }, [target.mode, target.code, target.status, target.reportId, mobileMode]);
 
   const isSavedView = report !== null && report.reportId !== null;
   const maxCategoryCount = report
@@ -264,7 +270,7 @@ export default function ReportPage() {
           </div>
         )}
 
-        {savedSummary && (
+        {!mobileMode && savedSummary && (
           <section
             role="status"
             aria-live="polite"
@@ -346,7 +352,7 @@ export default function ReportPage() {
                   </dd>
                 </div>
               </dl>
-              <p className="text-xs text-[#4d6a80] m-0 pt-2 border-t border-[#e6eef5]">
+              <p className="text-xs text-[#4d6a80] m-0 pt-2 border-t border-[#e6eef5] break-words [overflow-wrap:anywhere]">
                 {t("report.notesLine", {
                   notes: report.notes && report.notes.trim() !== "" ? report.notes : t("report.noNotes"),
                 })}
@@ -467,7 +473,7 @@ export default function ReportPage() {
                 )}
 
                 <footer className="flex flex-col gap-3 pt-2 border-t border-[#e6eef5]">
-                  {report.reportId === null && (
+                  {!mobileMode && report.reportId === null && (
                     <p className="text-xs text-[#4d6a80] m-0">
                       {batchStatus === "REPORTADO"
                         ? t("report.alreadyReportedHint")
@@ -477,33 +483,34 @@ export default function ReportPage() {
 
                   <div className="row flex flex-col sm:flex-row justify-end gap-3">
                     <a
-                      href={target.mode === "saved" ? "#/reportes" : "#/evaluados"}
+                      href={!mobileMode && target.mode === "saved" ? "#/reportes" : "#/evaluados"}
                       className="o inline-flex items-center justify-center no-underline px-5"
                     >
-                      {target.mode === "saved" ? t("report.backToSaved") : t("report.backToEvaluated")}
+                      {!mobileMode && target.mode === "saved" ? t("report.backToSaved") : t("report.backToEvaluated")}
                     </a>
 
-                    {report.reportId === null ? (
-                      <button
-                        type="button"
-                        id="save-report-button"
-                        className="p cursor-pointer disabled:opacity-50"
-                        disabled={!canSaveReport || isSaving}
-                        onClick={() => void saveBatchReport(report.batchCode)}
-                      >
-                        {isSaving ? t("report.saving") : t("report.save")}
-                      </button>
-                    ) : (
-                      <button
-                        type="button"
-                        id="export-report-pdf-button"
-                        className="p cursor-pointer disabled:opacity-50"
-                        disabled={isExporting}
-                        onClick={() => report.reportId !== null && void exportReportPdf(report.reportId)}
-                      >
-                        {isExporting ? t("report.exportingPdf") : t("report.exportPdf")}
-                      </button>
-                    )}
+                    {!mobileMode &&
+                      (report.reportId === null ? (
+                        <button
+                          type="button"
+                          id="save-report-button"
+                          className="p cursor-pointer disabled:opacity-50"
+                          disabled={!canSaveReport || isSaving}
+                          onClick={() => void saveBatchReport(report.batchCode)}
+                        >
+                          {isSaving ? t("report.saving") : t("report.save")}
+                        </button>
+                      ) : (
+                        <button
+                          type="button"
+                          id="export-report-pdf-button"
+                          className="p cursor-pointer disabled:opacity-50"
+                          disabled={isExporting}
+                          onClick={() => report.reportId !== null && void exportReportPdf(report.reportId)}
+                        >
+                          {isExporting ? t("report.exportingPdf") : t("report.exportPdf")}
+                        </button>
+                      ))}
                   </div>
                 </footer>
               </section>

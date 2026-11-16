@@ -29,6 +29,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -41,8 +42,9 @@ import java.util.Map;
 public class JasperReportGenerator implements ReportGenerator {
 
     private static final Logger logger = LoggerFactory.getLogger(JasperReportGenerator.class);
+    private static final ZoneId BOGOTA_ZONE = ZoneId.of("America/Bogota");
     private static final DateTimeFormatter GENERATED_AT_FORMATTER =
-            DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+            DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm").withZone(BOGOTA_ZONE);
 
     private JasperReport chartReport;
     private JasperReport batchReport;
@@ -123,7 +125,7 @@ public class JasperReportGenerator implements ReportGenerator {
         params.put("version", report.getVersion() != null ? "v" + report.getVersion() : "v1");
         params.put("currentStatus", report.isCurrent() ? "Vigente" : "Histórico");
         params.put("generatedAt", report.getGeneratedAt() != null
-                ? GENERATED_AT_FORMATTER.format(report.getGeneratedAt())
+                ? GENERATED_AT_FORMATTER.format(report.getGeneratedAt().atZoneSameInstant(BOGOTA_ZONE))
                 : "-");
         params.put("captureDate", batch != null && batch.getCaptureDate() != null
                 ? batch.getCaptureDate().toString()

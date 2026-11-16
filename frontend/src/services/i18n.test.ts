@@ -106,6 +106,19 @@ describe("i18n", () => {
       "Batch LOT-09 deleted successfully.",
     );
 
+    expect(translate("es", "batchManagement.successDelete", { code: "LOT-09" })).toBe(
+      "Lote LOT-09 eliminado correctamente.",
+    );
+    expect(translate("en", "batchManagement.successDelete", { code: "LOT-09" })).toBe(
+      "Batch LOT-09 deleted successfully.",
+    );
+
+    expect(translate("es", "savedReports.successDelete")).toBe("Reporte eliminado correctamente.");
+    expect(translate("en", "savedReports.successDelete")).toBe("Report deleted successfully.");
+    expect(translate("en", "savedReports.deleteSuccessItem", { version: 2, code: "LOT-09" })).toBe(
+      "Report v2 for batch LOT-09 deleted successfully.",
+    );
+
     expect(translate("en", "clave.inexistente")).toBe("clave.inexistente");
   });
 
