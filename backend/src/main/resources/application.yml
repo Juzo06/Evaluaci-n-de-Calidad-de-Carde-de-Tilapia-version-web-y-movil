@@ -23,7 +23,8 @@ spring:
     baseline-version: 0
     validate-on-migrate: false
     locations: classpath:db/migration
-
+server:
+  port: ${PORT:8080}
 secct:
   cnn:
     url: ${CNN_URL:https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent}
