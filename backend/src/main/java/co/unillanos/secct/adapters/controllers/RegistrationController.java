@@ -10,9 +10,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-/**
- * Controller exposing the user registration endpoint for HU-01 (DC-HU1, DS-HU1, PP-001).
- */
 @RestController
 public class RegistrationController {
 
@@ -22,7 +19,7 @@ public class RegistrationController {
         this.userService = userService;
     }
 
-    @PostMapping({"/api/users", "/api/auth/registro"})
+    @PostMapping({ "/api/users", "/api/auth/registro" })
     public ResponseEntity<RegisterUserResponseDTO> register(@Valid @RequestBody RegisterUserRequestDTO request) {
         RegisterUserResponseDTO response = userService.register(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);

@@ -1,5 +1,7 @@
 import { useState } from "react";
 import type { ChangeEvent, SyntheticEvent } from "react";
+import { useI18n } from "../i18n/I18nContext";
+import { localizeErrorMessage } from "../i18n/translations";
 import type { BatchFormField, BatchFormValues, RegisterBatchRequestDTO } from "../types/batch";
 import { ApiError } from "../services/apiClient";
 import { toRegisterBatchRequest, validateBatchForm } from "../validation/batchValidation";
@@ -21,6 +23,7 @@ const errorStyle = { color: "#b42318", fontWeight: 600 };
 const knownFields: BatchFormField[] = ["captureDate", "weightKg", "sampleUnitCount", "notes"];
 
 export default function BatchRegistrationForm({ onSubmit }: BatchRegistrationFormProps) {
+  const { locale, t } = useI18n();
   const [values, setValues] = useState<BatchFormValues>(emptyValues);
   const [errors, setErrors] = useState<BatchFormErrors>({});
   const [formError, setFormError] = useState<string | null>(null);
@@ -61,7 +64,7 @@ export default function BatchRegistrationForm({ onSubmit }: BatchRegistrationFor
         setErrors(serverErrors);
         setFormError(error.message);
       } else {
-        setFormError("Ocurrió un error inesperado. Intenta de nuevo.");
+        setFormError(t("app.unexpectedError"));
       }
     } finally {
       setIsSubmitting(false);
@@ -75,7 +78,7 @@ export default function BatchRegistrationForm({ onSubmit }: BatchRegistrationFor
     }
     return (
       <small id={`${field}Error`} role="alert" style={errorStyle}>
-        {message}
+        {localizeErrorMessage(message, locale)}
       </small>
     );
   }
@@ -85,51 +88,53 @@ export default function BatchRegistrationForm({ onSubmit }: BatchRegistrationFor
   }
 
   return (
-    <section aria-labelledby="register-batch-title" className="card" style={{ maxWidth: "860px" }}>
+    <section aria-labelledby="register-batch-title" className="card w-full max-w-3xl p-4 sm:p-6 lg:p-8 rounded-2xl bg-white border border-[#d5e3ee] shadow-sm">
       <form
-        style={{ display: "flex", flexDirection: "column", gap: "16px" }}
+        className="flex flex-col gap-4 w-full"
         onSubmit={handleSubmit}
         noValidate
       >
         {formError && (
           <aside role="alert" aria-live="assertive">
-            <small style={errorStyle}>{formError}</small>
+            <small style={errorStyle}>{localizeErrorMessage(formError, locale, "app.unexpectedError")}</small>
           </aside>
         )}
-        <fieldset>
-          <legend className="sr-only">Datos del lote</legend>
-          <label htmlFor="captureDate">
-            Fecha de captura
+        <fieldset className="border-0 p-0 m-0 grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 w-full">
+          <legend className="sr-only">{t("batchForm.dataLegend")}</legend>
+          <label htmlFor="captureDate" className="flex flex-col gap-1.5 text-sm w-full min-w-0">
+            {t("batchForm.captureDateLabel")}
             <input
               id="captureDate"
               type="date"
-              placeholder="dd/mm/aaaa"
+              placeholder={t("batchForm.captureDatePlaceholder")}
               name="captureDate"
               value={values.captureDate}
               onChange={handleChange}
               aria-invalid={Boolean(errors.captureDate)}
               aria-describedby={describedBy("captureDate")}
+              className="w-full min-w-0"
             />
-            <small id="captureDateHint">No puede ser futura</small>
+            <small id="captureDateHint">{t("batchForm.captureDateHint")}</small>
             {renderError("captureDate")}
           </label>
-          <label htmlFor="weightKg">
-            Peso (kg)
+          <label htmlFor="weightKg" className="flex flex-col gap-1.5 text-sm w-full min-w-0">
+            {t("batchForm.weightLabel")}
             <input
               id="weightKg"
               type="text"
-              placeholder="0,00"
+              placeholder={t("batchForm.weightPlaceholder")}
               name="weightKg"
               value={values.weightKg}
               onChange={handleChange}
               aria-invalid={Boolean(errors.weightKg)}
               aria-describedby={describedBy("weightKg")}
+              className="w-full min-w-0"
             />
-            <small id="weightKgHint">Mayor que 0, hasta 2 decimales, máx. 10.000,00</small>
+            <small id="weightKgHint">{t("batchForm.weightHint")}</small>
             {renderError("weightKg")}
           </label>
-          <label htmlFor="sampleUnitCount">
-            Número de unidades de muestra
+          <label htmlFor="sampleUnitCount" className="flex flex-col gap-1.5 text-sm w-full min-w-0">
+            {t("batchForm.unitsLabel")}
             <input
               id="sampleUnitCount"
               type="number"
@@ -139,39 +144,40 @@ export default function BatchRegistrationForm({ onSubmit }: BatchRegistrationFor
               onChange={handleChange}
               aria-invalid={Boolean(errors.sampleUnitCount)}
               aria-describedby={describedBy("sampleUnitCount")}
+              className="w-full min-w-0"
             />
-            <small id="sampleUnitCountHint">Entero de 1 a 500</small>
+            <small id="sampleUnitCountHint">{t("batchForm.unitsHint")}</small>
             {renderError("sampleUnitCount")}
           </label>
         </fieldset>
 
-        <fieldset style={{ display: "flex", flexDirection: "column", gap: "6px", border: 0, padding: 0, margin: 0 }}>
-          <legend className="sr-only">Observaciones del lote</legend>
-          <label htmlFor="notes">
-            Observaciones (opcional)
+        <fieldset className="border-0 p-0 m-0 flex flex-col gap-1.5 w-full">
+          <legend className="sr-only">{t("batchForm.notesLegend")}</legend>
+          <label htmlFor="notes" className="flex flex-col gap-1.5 text-sm w-full min-w-0">
+            {t("batchForm.notesLabel")}
             <textarea
               id="notes"
-              placeholder="Máximo 500 caracteres"
+              placeholder={t("batchForm.notesPlaceholder")}
               name="notes"
               value={values.notes}
               onChange={handleChange}
               aria-invalid={Boolean(errors.notes)}
               aria-describedby={errors.notes ? "notesError" : "notesHint"}
+              className="w-full min-w-0"
             />
             {renderError("notes")}
           </label>
         </fieldset>
 
-        <small id="notesHint">
-          El código del lote (máx. 30 caracteres) lo genera el sistema al guardar. El lote queda en estado ABIERTO,
-          disponible para evaluar.
+        <small id="notesHint" className="text-xs text-[#4d6a80]">
+          {t("batchForm.codeNote")}
         </small>
-        <footer className="row">
-          <button className="o" type="button" onClick={handleCancel}>
-            Cancelar
+        <footer className="row flex flex-col-reverse sm:flex-row justify-end gap-3 mt-6 w-full">
+          <button className="o w-full sm:w-auto" type="button" onClick={handleCancel}>
+            {t("batchForm.cancel")}
           </button>
-          <button className="p" type="submit" disabled={isSubmitting}>
-            Guardar lote
+          <button className="p w-full sm:w-auto" type="submit" disabled={isSubmitting}>
+            {t("batchForm.submit")}
           </button>
         </footer>
       </form>

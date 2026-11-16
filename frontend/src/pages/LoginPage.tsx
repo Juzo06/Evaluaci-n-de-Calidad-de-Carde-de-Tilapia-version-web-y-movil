@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import { useI18n } from "../i18n/I18nContext";
+import { localizeErrorMessage } from "../i18n/translations";
 import type { LoginRequestDTO, LoginResponseDTO } from "../types/auth";
 import { login } from "../services/authService";
 import {
@@ -12,6 +14,7 @@ import { validateLoginForm, LoginFormErrors } from "../validation/authValidation
  * Split-screen 50/50 layout matching Mockup HU-02.
  */
 export default function LoginPage() {
+  const { locale, setLocale, t } = useI18n();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState<LoginFormErrors>({});
@@ -68,7 +71,7 @@ export default function LoginPage() {
       if (err instanceof Error) {
         setApiError(err.message);
       } else {
-        setApiError("Credenciales inválidas.");
+        setApiError(t("auth.login.invalidCredentialsFallback"));
       }
     }
   };
@@ -80,26 +83,26 @@ export default function LoginPage() {
   };
 
   return (
-    <main className="min-h-screen w-full flex flex-col md:flex-row bg-white">
+    <main id="main-content" className="min-h-screen w-full flex flex-col md:flex-row bg-white">
       {/* Panel Izquierdo Azul (Mockup HU-02) */}
       <aside
-        aria-label="Información del sistema"
+        aria-label={t("auth.systemInfoAria")}
         className="w-full md:w-1/2 bg-[#094b72] text-white p-8 sm:p-12 md:p-16 flex flex-col justify-center min-h-[360px] md:min-h-screen flex-shrink-0"
       >
         <header className="max-w-md mx-auto md:mx-0 w-full flex flex-col gap-4">
           <p className="font-serif text-xl sm:text-2xl text-white/90 m-0">
-            Calidad de Tilapia
+            {t("auth.brandName")}
           </p>
           <h1 id="hero-title" className="font-serif font-bold text-4xl sm:text-5xl text-white leading-tight m-0">
-            Bienvenido de nuevo
+            {t("auth.login.heroTitle")}
           </h1>
           <p className="text-white/85 text-base sm:text-lg m-0 mt-2">
-            Ingresa para continuar con tus lotes y evaluaciones.
+            {t("auth.login.heroSubtitle")}
           </p>
         </header>
         <footer className="max-w-md mx-auto md:mx-0 w-full pt-4">
           <span className="inline-block bg-[#073856] text-white/95 text-xs font-semibold px-4 py-2 rounded-full border border-white/10 shadow-sm">
-            Clasificación NTC 1443
+            {t("auth.badgeNtc")}
           </span>
         </footer>
       </aside>
@@ -110,10 +113,36 @@ export default function LoginPage() {
         className="w-full md:w-1/2 bg-white p-6 sm:p-10 md:p-16 flex flex-col justify-center items-center min-h-screen"
       >
         <div className="w-full max-w-[420px]">
-          <header className="mb-8">
-            <h2 id="form-title" className="text-3xl sm:text-4xl font-serif font-bold text-[#0d3b66]">
-              Iniciar sesión
+          <header className="mb-8 flex items-center justify-between gap-3">
+            <h2 id="form-title" className="text-3xl sm:text-4xl font-serif font-bold text-[#0d3b66] m-0">
+              {t("auth.login.formTitle")}
             </h2>
+            <div
+              role="group"
+              aria-label={t("app.languageLabel")}
+              className="inline-flex rounded-lg border border-[#8fb0c9] bg-[#f4f8fb] p-0.5 shrink-0"
+            >
+              <button
+                type="button"
+                onClick={() => setLocale("es")}
+                aria-pressed={locale === "es"}
+                className={`px-2.5 py-1 rounded-md text-xs font-semibold transition-colors cursor-pointer ${
+                  locale === "es" ? "bg-[#094b72] text-white" : "text-[#0d3b66]"
+                }`}
+              >
+                ES
+              </button>
+              <button
+                type="button"
+                onClick={() => setLocale("en")}
+                aria-pressed={locale === "en"}
+                className={`px-2.5 py-1 rounded-md text-xs font-semibold transition-colors cursor-pointer ${
+                  locale === "en" ? "bg-[#094b72] text-white" : "text-[#0d3b66]"
+                }`}
+              >
+                EN
+              </button>
+            </div>
           </header>
 
           <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-5 w-full">
@@ -121,7 +150,7 @@ export default function LoginPage() {
               className="p-0 m-0 border-0 flex flex-col gap-5"
               style={{ display: "flex", flexDirection: "column" }}
             >
-              <legend className="sr-only">Credenciales de acceso</legend>
+              <legend className="sr-only">{t("auth.login.legend")}</legend>
 
               {/* Campo Correo electrónico */}
               <div className="flex flex-col gap-1.5">
@@ -129,14 +158,14 @@ export default function LoginPage() {
                   htmlFor="email"
                   className="text-sm font-medium text-[#0d3b66]"
                 >
-                  Correo electrónico
+                  {t("auth.login.emailLabel")}
                 </label>
                 <input
                   id="email"
                   type="email"
                   name="email"
                   autoComplete="email"
-                  placeholder="nombre@correo.com"
+                  placeholder={t("auth.login.emailPlaceholder")}
                   value={email}
                   onChange={(e) => {
                     setEmail(e.target.value);
@@ -151,7 +180,7 @@ export default function LoginPage() {
                 />
                 {errors.email && (
                   <p id="email-error" role="alert" className="text-red-600 text-xs font-semibold mt-1 mb-0">
-                    {errors.email}
+                    {localizeErrorMessage(errors.email, locale)}
                   </p>
                 )}
               </div>
@@ -162,7 +191,7 @@ export default function LoginPage() {
                   htmlFor="password"
                   className="text-sm font-medium text-[#0d3b66]"
                 >
-                  Contraseña
+                  {t("auth.login.passwordLabel")}
                 </label>
                 <input
                   id="password"
@@ -183,7 +212,7 @@ export default function LoginPage() {
                 />
                 {errors.password && (
                   <p id="password-error" role="alert" className="text-red-600 text-xs font-semibold mt-1 mb-0">
-                    {errors.password}
+                    {localizeErrorMessage(errors.password, locale)}
                   </p>
                 )}
               </div>
@@ -197,7 +226,7 @@ export default function LoginPage() {
                 aria-live="assertive"
                 className="text-red-600 text-xs font-semibold"
               >
-                {apiError}
+                {localizeErrorMessage(apiError, locale)}
               </aside>
             )}
 
@@ -231,28 +260,28 @@ export default function LoginPage() {
                       d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
                     />
                   </svg>
-                  <span>Ingresando...</span>
+                  <span>{t("auth.login.submitting")}</span>
                 </>
               ) : (
-                "Ingresar"
+                t("auth.login.submit")
               )}
             </button>
 
             {/* Enlace inferior y nota al pie agrupados en footer */}
             <footer className="flex flex-col gap-4 mt-2">
               <div className="text-center text-sm text-[#5b738b]">
-                ¿Aún no tienes cuenta?{" "}
+                {t("auth.login.noAccount")}{" "}
                 <a
                   href="#/registro"
                   id="login-to-register-link"
                   className="text-[#094b72] font-semibold underline underline-offset-4 hover:text-[#073a5a]"
                 >
-                  Regístrate
+                  {t("auth.login.registerLink")}
                 </a>
               </div>
 
-              <p className="text-xs text-[#8a9ba8] text-center m-0 leading-relaxed">
-                Al ingresar, el sistema te lleva a la vista de tu rol: piscicultor o administrador.
+              <p className="text-xs text-[#4d6a80] text-center m-0 leading-relaxed">
+                {t("auth.login.roleNotice")}
               </p>
             </footer>
           </form>

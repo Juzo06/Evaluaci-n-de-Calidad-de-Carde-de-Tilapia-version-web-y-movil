@@ -56,3 +56,13 @@ export interface LoginFormValues {
 }
 
 export type LoginFormField = keyof LoginFormValues;
+
+/** Request body of POST /api/users/me/delete according to DC-HU8. */
+export interface DeleteAccountRequestDTO {
+  password: string;
+}
+
+export interface DeleteAccountFormErrors {
+  password?: string;
+  confirmed?: string;
+}

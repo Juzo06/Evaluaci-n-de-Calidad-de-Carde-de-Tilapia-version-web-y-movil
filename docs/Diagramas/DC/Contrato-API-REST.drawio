@@ -1,0 +1,166 @@
+<mxfile host="Electron">
+  <diagram id="c9P8E4nhW8PK5rK-RVqP" name="Página-1">
+    <mxGraphModel dx="2479" dy="1151" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <UserObject label="" mermaidData="{&#xa;  &quot;data&quot;: &quot;classDiagram\r\ndirection LR\r\nclass Cliente_Web_Movil {\r\n  &lt;&lt;React / PWA · Bearer JWT&gt;&gt;\r\n  +Authorization: Bearer accessToken\r\n}\r\nclass AuthController_UserController_Sprint1 {\r\n  &lt;&lt;HU-01 y HU-02&gt;&gt;\r\n  +POST /api/users (RegisterUserRequestDTO) 201\r\n  +POST /api/auth/login (LoginRequestDTO) 200\r\n  +POST /api/auth/logout 204\r\n}\r\nclass BatchController_EvaluationController_Sprint1 {\r\n  &lt;&lt;HU-03, HU-04 y HU-05&gt;&gt;\r\n  +POST /api/batches (RegisterBatchRequestDTO) 201\r\n  +GET /api/batches/available?estado=... 200\r\n  +GET /api/batches/evaluated 200\r\n  +GET /api/batches/{code} 200\r\n  +POST /api/evaluations/batches/{code}/units (multipart/form-data) 201\r\n  +POST /api/evaluations/batches/{code}/close 200\r\n}\r\nclass ReportController_Sprint2 {\r\n  &lt;&lt;HU-06, HU-10, HU-11, HU-12 y HU-14&gt;&gt;\r\n  +GET /api/reports/batches/{code} (HU-06 Generar vista previa) 200\r\n  +POST /api/reports/batches/{code} (HU-10 Guardar versión vigente) 201\r\n  +GET /api/reports?code=&amp;from=&amp;to=&amp;minClassification= (HU-11 Listar) 200\r\n  +GET /api/reports/{id} (HU-11 Consultar detalle) 200\r\n  +GET /api/reports/{id}/pdf (HU-12 Exportar application/pdf) 200\r\n  +DELETE /api/reports/{id} (HU-14 Borrado lógico) 204\r\n}\r\nclass Admin_User_Batch_Sprint2 {\r\n  &lt;&lt;HU-07, HU-08, HU-09 y HU-13&gt;&gt;\r\n  +GET /api/admin/system-info (HU-07 Totales del sistema) 200\r\n  +DELETE /api/users/me (HU-08 DeleteAccountRequestDTO) 204\r\n  +DELETE /api/batches/{code} (HU-09 Eliminar lote y cascada lógica) 204\r\n  +PATCH /api/batches/{code}/sample-size (HU-13 ExpandSampleRequestDTO) 200\r\n}\r\nCliente_Web_Movil --&gt; AuthController_UserController_Sprint1 : HTTP / JSON\r\nCliente_Web_Movil --&gt; BatchController_EvaluationController_Sprint1 : HTTP / JSON / Multipart\r\nCliente_Web_Movil --&gt; ReportController_Sprint2 : HTTP / JSON / PDF\r\nCliente_Web_Movil --&gt; Admin_User_Batch_Sprint2 : HTTP / JSON\r\n&quot;,&#xa;  &quot;config&quot;: null&#xa;}" id="41">
+          <mxCell connectable="0" parent="1" style="group;transparentBounds=1;editIcon=1;lockedGroup=0;groupPadding=10;" vertex="1">
+            <mxGeometry as="geometry" />
+          </mxCell>
+        </UserObject>
+        <UserObject label="&lt;b&gt;Cliente_Web_Movil&lt;/b&gt;" mermaidId="n:Cliente_Web_Movil" mermaidBaseStyle="swimlane;html=1;fontStyle=1;fontSize=16;align=center;verticalAlign=middle;horizontal=1;childLayout=stackLayout;startSize=72;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginTop=12;marginBottom=12;stackSpacing=0;swimlaneFillColor=light-dark(#ECECFF,#1f2020);whiteSpace=wrap;spacingTop=24;fillColor=light-dark(#ECECFF,#1f2020);strokeColor=light-dark(#9370DB,#cccccc);fontColor=light-dark(#333333,#cccccc);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;" mermaidBaseValue="&lt;b&gt;Cliente_Web_Movil&lt;/b&gt;" id="2">
+          <mxCell parent="41" style="swimlane;html=1;fontStyle=1;fontSize=16;align=center;verticalAlign=middle;horizontal=1;childLayout=stackLayout;startSize=72;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginTop=12;marginBottom=12;stackSpacing=0;swimlaneFillColor=light-dark(#ECECFF,#1f2020);whiteSpace=wrap;spacingTop=24;fillColor=light-dark(#ECECFF,#1f2020);strokeColor=light-dark(#9370DB,#cccccc);fontColor=light-dark(#333333,#cccccc);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;" vertex="1">
+            <mxGeometry height="144" width="381" x="10" y="469" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <mxCell id="3" parent="2" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=16;movable=0;resizable=0;rotatable=0;points=[];fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontColor=light-dark(#333333,#cccccc);" value="«React / PWA · Bearer JWT»" vertex="1">
+          <mxGeometry height="24" width="381" y="12" as="geometry" />
+        </mxCell>
+        <mxCell id="4" parent="2" style="text;fontSize=16;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=10;spacingRight=12;spacingBottom=2;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontColor=light-dark(#333333,#cccccc);" value="+Authorization: Bearer accessToken" vertex="1">
+          <mxGeometry height="24" width="381" y="84" as="geometry" />
+        </mxCell>
+        <mxCell id="5" parent="2" style="line;strokeWidth=1;fillColor=none;spacingLeft=3;spacingRight=3;rotatable=0;points=[];strokeColor=inherit;" vertex="1">
+          <mxGeometry height="24" width="381" y="108" as="geometry" />
+        </mxCell>
+        <UserObject label="&lt;b&gt;AuthController_UserController_Sprint1&lt;/b&gt;" mermaidId="n:AuthController_UserController_Sprint1" mermaidBaseStyle="swimlane;html=1;fontStyle=1;fontSize=16;align=center;verticalAlign=middle;horizontal=1;childLayout=stackLayout;startSize=72;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginTop=12;marginBottom=12;stackSpacing=0;swimlaneFillColor=light-dark(#ECECFF,#1f2020);whiteSpace=wrap;spacingTop=24;fillColor=light-dark(#ECECFF,#1f2020);strokeColor=light-dark(#9370DB,#cccccc);fontColor=light-dark(#333333,#cccccc);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;" mermaidBaseValue="&lt;b&gt;AuthController_UserController_Sprint1&lt;/b&gt;" id="6">
+          <mxCell parent="41" style="swimlane;html=1;fontStyle=1;fontSize=16;align=center;verticalAlign=middle;horizontal=1;childLayout=stackLayout;startSize=72;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginTop=12;marginBottom=12;stackSpacing=0;swimlaneFillColor=light-dark(#ECECFF,#1f2020);whiteSpace=wrap;spacingTop=24;fillColor=light-dark(#ECECFF,#1f2020);strokeColor=light-dark(#9370DB,#cccccc);fontColor=light-dark(#333333,#cccccc);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;" vertex="1">
+            <mxGeometry height="192" width="510" x="722" y="10" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <mxCell id="7" parent="6" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=16;movable=0;resizable=0;rotatable=0;points=[];fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontColor=light-dark(#333333,#cccccc);" value="«HU-01 y HU-02»" vertex="1">
+          <mxGeometry height="24" width="510" y="12" as="geometry" />
+        </mxCell>
+        <mxCell id="8" parent="6" style="text;fontSize=16;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=10;spacingRight=12;spacingBottom=2;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontColor=light-dark(#333333,#cccccc);" value="+POST /api/auth/logout 204" vertex="1">
+          <mxGeometry height="24" width="510" y="84" as="geometry" />
+        </mxCell>
+        <mxCell id="9" parent="6" style="line;strokeWidth=1;fillColor=none;spacingLeft=3;spacingRight=3;rotatable=0;points=[];strokeColor=inherit;" vertex="1">
+          <mxGeometry height="24" width="510" y="108" as="geometry" />
+        </mxCell>
+        <mxCell id="10" parent="6" style="text;fontSize=16;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=10;spacingRight=12;spacingBottom=2;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontColor=light-dark(#333333,#cccccc);" value="+POST /api/users (RegisterUserRequestDTO) 201" vertex="1">
+          <mxGeometry height="24" width="510" y="132" as="geometry" />
+        </mxCell>
+        <mxCell id="11" parent="6" style="text;fontSize=16;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=10;spacingRight=12;spacingBottom=2;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontColor=light-dark(#333333,#cccccc);" value="+POST /api/auth/login (LoginRequestDTO) 200" vertex="1">
+          <mxGeometry height="24" width="510" y="156" as="geometry" />
+        </mxCell>
+        <UserObject label="&lt;b&gt;BatchController_EvaluationController_Sprint1&lt;/b&gt;" mermaidId="n:BatchController_EvaluationController_Sprint1" mermaidBaseStyle="swimlane;html=1;fontStyle=1;fontSize=16;align=center;verticalAlign=middle;horizontal=1;childLayout=stackLayout;startSize=72;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginTop=12;marginBottom=12;stackSpacing=0;swimlaneFillColor=light-dark(#ECECFF,#1f2020);whiteSpace=wrap;spacingTop=24;fillColor=light-dark(#ECECFF,#1f2020);strokeColor=light-dark(#9370DB,#cccccc);fontColor=light-dark(#333333,#cccccc);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;" mermaidBaseValue="&lt;b&gt;BatchController_EvaluationController_Sprint1&lt;/b&gt;" id="12">
+          <mxCell parent="41" style="swimlane;html=1;fontStyle=1;fontSize=16;align=center;verticalAlign=middle;horizontal=1;childLayout=stackLayout;startSize=72;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginTop=12;marginBottom=12;stackSpacing=0;swimlaneFillColor=light-dark(#ECECFF,#1f2020);whiteSpace=wrap;spacingTop=24;fillColor=light-dark(#ECECFF,#1f2020);strokeColor=light-dark(#9370DB,#cccccc);fontColor=light-dark(#333333,#cccccc);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;" vertex="1">
+            <mxGeometry height="264" width="714" x="620" y="252" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <mxCell id="13" parent="12" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=16;movable=0;resizable=0;rotatable=0;points=[];fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontColor=light-dark(#333333,#cccccc);" value="«HU-03, HU-04 y HU-05»" vertex="1">
+          <mxGeometry height="24" width="714" y="12" as="geometry" />
+        </mxCell>
+        <mxCell id="14" parent="12" style="text;fontSize=16;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=10;spacingRight=12;spacingBottom=2;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontColor=light-dark(#333333,#cccccc);" value="+GET /api/batches/available?estado=... 200" vertex="1">
+          <mxGeometry height="24" width="714" y="84" as="geometry" />
+        </mxCell>
+        <mxCell id="15" parent="12" style="text;fontSize=16;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=10;spacingRight=12;spacingBottom=2;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontColor=light-dark(#333333,#cccccc);" value="+GET /api/batches/evaluated 200" vertex="1">
+          <mxGeometry height="24" width="714" y="108" as="geometry" />
+        </mxCell>
+        <mxCell id="16" parent="12" style="text;fontSize=16;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=10;spacingRight=12;spacingBottom=2;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontColor=light-dark(#333333,#cccccc);" value="+GET /api/batches/{code} 200" vertex="1">
+          <mxGeometry height="24" width="714" y="132" as="geometry" />
+        </mxCell>
+        <mxCell id="17" parent="12" style="text;fontSize=16;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=10;spacingRight=12;spacingBottom=2;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontColor=light-dark(#333333,#cccccc);" value="+POST /api/evaluations/batches/{code}/close 200" vertex="1">
+          <mxGeometry height="24" width="714" y="156" as="geometry" />
+        </mxCell>
+        <mxCell id="18" parent="12" style="line;strokeWidth=1;fillColor=none;spacingLeft=3;spacingRight=3;rotatable=0;points=[];strokeColor=inherit;" vertex="1">
+          <mxGeometry height="24" width="714" y="180" as="geometry" />
+        </mxCell>
+        <mxCell id="19" parent="12" style="text;fontSize=16;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=10;spacingRight=12;spacingBottom=2;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontColor=light-dark(#333333,#cccccc);" value="+POST /api/batches (RegisterBatchRequestDTO) 201" vertex="1">
+          <mxGeometry height="24" width="714" y="204" as="geometry" />
+        </mxCell>
+        <mxCell id="20" parent="12" style="text;fontSize=16;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=10;spacingRight=12;spacingBottom=2;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontColor=light-dark(#333333,#cccccc);" value="+POST /api/evaluations/batches/{code}/units (multipart/form-data) 201" vertex="1">
+          <mxGeometry height="24" width="714" y="228" as="geometry" />
+        </mxCell>
+        <UserObject label="&lt;b&gt;ReportController_Sprint2&lt;/b&gt;" mermaidId="n:ReportController_Sprint2" mermaidBaseStyle="swimlane;html=1;fontStyle=1;fontSize=16;align=center;verticalAlign=middle;horizontal=1;childLayout=stackLayout;startSize=72;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginTop=12;marginBottom=12;stackSpacing=0;swimlaneFillColor=light-dark(#ECECFF,#1f2020);whiteSpace=wrap;spacingTop=24;fillColor=light-dark(#ECECFF,#1f2020);strokeColor=light-dark(#9370DB,#cccccc);fontColor=light-dark(#333333,#cccccc);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;" mermaidBaseValue="&lt;b&gt;ReportController_Sprint2&lt;/b&gt;" id="21">
+          <mxCell parent="41" style="swimlane;html=1;fontStyle=1;fontSize=16;align=center;verticalAlign=middle;horizontal=1;childLayout=stackLayout;startSize=72;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginTop=12;marginBottom=12;stackSpacing=0;swimlaneFillColor=light-dark(#ECECFF,#1f2020);whiteSpace=wrap;spacingTop=24;fillColor=light-dark(#ECECFF,#1f2020);strokeColor=light-dark(#9370DB,#cccccc);fontColor=light-dark(#333333,#cccccc);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;" vertex="1">
+            <mxGeometry height="264" width="711" x="622" y="566" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <mxCell id="22" parent="21" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=16;movable=0;resizable=0;rotatable=0;points=[];fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontColor=light-dark(#333333,#cccccc);" value="«HU-06, HU-10, HU-11, HU-12 y HU-14»" vertex="1">
+          <mxGeometry height="24" width="711" y="12" as="geometry" />
+        </mxCell>
+        <mxCell id="23" parent="21" style="line;strokeWidth=1;fillColor=none;spacingLeft=3;spacingRight=3;rotatable=0;points=[];strokeColor=inherit;" vertex="1">
+          <mxGeometry height="24" width="711" y="84" as="geometry" />
+        </mxCell>
+        <mxCell id="24" parent="21" style="text;fontSize=16;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=10;spacingRight=12;spacingBottom=2;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontColor=light-dark(#333333,#cccccc);" value="+GET /api/reports/batches/{code} (HU-06 Generar vista previa) 200" vertex="1">
+          <mxGeometry height="24" width="711" y="108" as="geometry" />
+        </mxCell>
+        <mxCell id="25" parent="21" style="text;fontSize=16;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=10;spacingRight=12;spacingBottom=2;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontColor=light-dark(#333333,#cccccc);" value="+POST /api/reports/batches/{code} (HU-10 Guardar versión vigente) 201" vertex="1">
+          <mxGeometry height="24" width="711" y="132" as="geometry" />
+        </mxCell>
+        <mxCell id="26" parent="21" style="text;fontSize=16;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=10;spacingRight=12;spacingBottom=2;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontColor=light-dark(#333333,#cccccc);" value="+GET /api/reports?code=&amp;from=&amp;to=&amp;minClassification= (HU-11 Listar) 200" vertex="1">
+          <mxGeometry height="24" width="711" y="156" as="geometry" />
+        </mxCell>
+        <mxCell id="27" parent="21" style="text;fontSize=16;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=10;spacingRight=12;spacingBottom=2;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontColor=light-dark(#333333,#cccccc);" value="+GET /api/reports/{id} (HU-11 Consultar detalle) 200" vertex="1">
+          <mxGeometry height="24" width="711" y="180" as="geometry" />
+        </mxCell>
+        <mxCell id="28" parent="21" style="text;fontSize=16;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=10;spacingRight=12;spacingBottom=2;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontColor=light-dark(#333333,#cccccc);" value="+GET /api/reports/{id}/pdf (HU-12 Exportar application/pdf) 200" vertex="1">
+          <mxGeometry height="24" width="711" y="204" as="geometry" />
+        </mxCell>
+        <mxCell id="29" parent="21" style="text;fontSize=16;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=10;spacingRight=12;spacingBottom=2;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontColor=light-dark(#333333,#cccccc);" value="+DELETE /api/reports/{id} (HU-14 Borrado lógico) 204" vertex="1">
+          <mxGeometry height="24" width="711" y="228" as="geometry" />
+        </mxCell>
+        <UserObject label="&lt;b&gt;Admin_User_Batch_Sprint2&lt;/b&gt;" mermaidId="n:Admin_User_Batch_Sprint2" mermaidBaseStyle="swimlane;html=1;fontStyle=1;fontSize=16;align=center;verticalAlign=middle;horizontal=1;childLayout=stackLayout;startSize=72;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginTop=12;marginBottom=12;stackSpacing=0;swimlaneFillColor=light-dark(#ECECFF,#1f2020);whiteSpace=wrap;spacingTop=24;fillColor=light-dark(#ECECFF,#1f2020);strokeColor=light-dark(#9370DB,#cccccc);fontColor=light-dark(#333333,#cccccc);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;" mermaidBaseValue="&lt;b&gt;Admin_User_Batch_Sprint2&lt;/b&gt;" id="30">
+          <mxCell parent="41" style="swimlane;html=1;fontStyle=1;fontSize=16;align=center;verticalAlign=middle;horizontal=1;childLayout=stackLayout;startSize=72;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginTop=12;marginBottom=12;stackSpacing=0;swimlaneFillColor=light-dark(#ECECFF,#1f2020);whiteSpace=wrap;spacingTop=24;fillColor=light-dark(#ECECFF,#1f2020);strokeColor=light-dark(#9370DB,#cccccc);fontColor=light-dark(#333333,#cccccc);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;" vertex="1">
+            <mxGeometry height="216" width="721" x="617" y="880" as="geometry" />
+          </mxCell>
+        </UserObject>
+        <mxCell id="31" parent="30" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=16;movable=0;resizable=0;rotatable=0;points=[];fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontColor=light-dark(#333333,#cccccc);" value="«HU-07, HU-08, HU-09 y HU-13»" vertex="1">
+          <mxGeometry height="24" width="721" y="12" as="geometry" />
+        </mxCell>
+        <mxCell id="32" parent="30" style="line;strokeWidth=1;fillColor=none;spacingLeft=3;spacingRight=3;rotatable=0;points=[];strokeColor=inherit;" vertex="1">
+          <mxGeometry height="24" width="721" y="84" as="geometry" />
+        </mxCell>
+        <mxCell id="33" parent="30" style="text;fontSize=16;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=10;spacingRight=12;spacingBottom=2;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontColor=light-dark(#333333,#cccccc);" value="+GET /api/admin/system-info (HU-07 Totales del sistema) 200" vertex="1">
+          <mxGeometry height="24" width="721" y="108" as="geometry" />
+        </mxCell>
+        <mxCell id="34" parent="30" style="text;fontSize=16;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=10;spacingRight=12;spacingBottom=2;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontColor=light-dark(#333333,#cccccc);" value="+DELETE /api/users/me (HU-08 DeleteAccountRequestDTO) 204" vertex="1">
+          <mxGeometry height="24" width="721" y="132" as="geometry" />
+        </mxCell>
+        <mxCell id="35" parent="30" style="text;fontSize=16;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=10;spacingRight=12;spacingBottom=2;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontColor=light-dark(#333333,#cccccc);" value="+DELETE /api/batches/{code} (HU-09 Eliminar lote y cascada lógica) 204" vertex="1">
+          <mxGeometry height="24" width="721" y="156" as="geometry" />
+        </mxCell>
+        <mxCell id="36" parent="30" style="text;fontSize=16;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=10;spacingRight=12;spacingBottom=2;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontColor=light-dark(#333333,#cccccc);" value="+PATCH /api/batches/{code}/sample-size (HU-13 ExpandSampleRequestDTO) 200" vertex="1">
+          <mxGeometry height="24" width="721" y="180" as="geometry" />
+        </mxCell>
+        <UserObject label="HTTP / JSON" mermaidId="e:Cliente_Web_Movil-&gt;AuthController_UserController_Sprint1#0" mermaidBaseStyle="curved=1;startArrow=none;endArrow=classic;endSize=9;strokeColor=light-dark(#333333,#cccccc);html=1;fontSize=16;labelBackgroundColor=light-dark(#ECECFF,#1f2020);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontColor=light-dark(#333333,#cccccc);exitX=0.63;exitY=0;entryX=0;entryY=0.5;" mermaidBaseValue="HTTP / JSON" id="37">
+          <mxCell edge="1" parent="41" source="2" style="curved=1;startArrow=none;endArrow=classic;endSize=9;strokeColor=light-dark(#333333,#cccccc);html=1;fontSize=16;labelBackgroundColor=light-dark(#ECECFF,#1f2020);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontColor=light-dark(#333333,#cccccc);exitX=0.63;exitY=0;entryX=0;entryY=0.5;" target="6">
+            <mxGeometry relative="1" as="geometry">
+              <Array as="points">
+                <mxPoint x="504" y="106" />
+              </Array>
+            </mxGeometry>
+          </mxCell>
+        </UserObject>
+        <UserObject label="HTTP / JSON / Multipart" mermaidId="e:Cliente_Web_Movil-&gt;BatchController_EvaluationController_Sprint1#0" mermaidBaseStyle="curved=1;startArrow=none;endArrow=classic;endSize=9;strokeColor=light-dark(#333333,#cccccc);html=1;fontSize=16;labelBackgroundColor=light-dark(#ECECFF,#1f2020);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontColor=light-dark(#333333,#cccccc);exitX=0.86;exitY=0;entryX=0;entryY=0.5;" mermaidBaseValue="HTTP / JSON / Multipart" id="38">
+          <mxCell edge="1" parent="41" source="2" style="curved=1;startArrow=none;endArrow=classic;endSize=9;strokeColor=light-dark(#333333,#cccccc);html=1;fontSize=16;labelBackgroundColor=light-dark(#ECECFF,#1f2020);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontColor=light-dark(#333333,#cccccc);exitX=0.86;exitY=0;entryX=0;entryY=0.5;" target="12">
+            <mxGeometry relative="1" as="geometry">
+              <Array as="points">
+                <mxPoint x="504" y="384" />
+              </Array>
+            </mxGeometry>
+          </mxCell>
+        </UserObject>
+        <UserObject label="HTTP / JSON / PDF" mermaidId="e:Cliente_Web_Movil-&gt;ReportController_Sprint2#0" mermaidBaseStyle="curved=1;startArrow=none;endArrow=classic;endSize=9;strokeColor=light-dark(#333333,#cccccc);html=1;fontSize=16;labelBackgroundColor=light-dark(#ECECFF,#1f2020);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontColor=light-dark(#333333,#cccccc);exitX=0.86;exitY=1;entryX=0;entryY=0.5;" mermaidBaseValue="HTTP / JSON / PDF" id="39">
+          <mxCell edge="1" parent="41" source="2" style="curved=1;startArrow=none;endArrow=classic;endSize=9;strokeColor=light-dark(#333333,#cccccc);html=1;fontSize=16;labelBackgroundColor=light-dark(#ECECFF,#1f2020);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontColor=light-dark(#333333,#cccccc);exitX=0.86;exitY=1;entryX=0;entryY=0.5;" target="21">
+            <mxGeometry relative="1" as="geometry">
+              <Array as="points">
+                <mxPoint x="504" y="698" />
+              </Array>
+            </mxGeometry>
+          </mxCell>
+        </UserObject>
+        <UserObject label="HTTP / JSON" mermaidId="e:Cliente_Web_Movil-&gt;Admin_User_Batch_Sprint2#0" mermaidBaseStyle="curved=1;startArrow=none;endArrow=classic;endSize=9;strokeColor=light-dark(#333333,#cccccc);html=1;fontSize=16;labelBackgroundColor=light-dark(#ECECFF,#1f2020);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontColor=light-dark(#333333,#cccccc);exitX=0.63;exitY=1;entryX=0;entryY=0.5;" mermaidBaseValue="HTTP / JSON" id="40">
+          <mxCell edge="1" parent="41" source="2" style="curved=1;startArrow=none;endArrow=classic;endSize=9;strokeColor=light-dark(#333333,#cccccc);html=1;fontSize=16;labelBackgroundColor=light-dark(#ECECFF,#1f2020);fontFamily=Trebuchet MS,Verdana,Arial,sans-serif;fontColor=light-dark(#333333,#cccccc);exitX=0.63;exitY=1;entryX=0;entryY=0.5;" target="30">
+            <mxGeometry relative="1" as="geometry">
+              <Array as="points">
+                <mxPoint x="504" y="988" />
+              </Array>
+            </mxGeometry>
+          </mxCell>
+        </UserObject>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

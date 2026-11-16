@@ -54,6 +54,15 @@ public class Log {
         this.description = description;
     }
 
+    public Log(EventType eventType, Integer userId, Integer batchId, Integer evaluationId, String description) {
+        this.eventType = eventType;
+        this.userId = userId;
+        this.batchId = batchId;
+        this.evaluationId = evaluationId;
+        this.occurredAt = OffsetDateTime.now();
+        this.description = description;
+    }
+
     @PrePersist
     void onPersist() {
         if (this.occurredAt == null) {

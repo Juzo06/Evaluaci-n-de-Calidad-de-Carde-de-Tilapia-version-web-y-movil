@@ -75,13 +75,10 @@ public class EvaluationService {
 
         String imageReference = generateImageReference(image);
         if (evaluationRepository.existsByBatchIdAndImageReference(batch.getId(), imageReference)) {
-            throw new BusinessException("Esta imagen ya fue evaluada en el lote", 409);
+            throw new BusinessException("Esta imagen ya fue evaluada anteriormente. Carga una imagen distinta.", 409);
         }
 
         List<ClassificationResult> results = classifier.classify(image);
-
-        batch.startEvaluation(findStatus(BatchStatus.IN_EVALUATION));
-        batchRepository.save(batch);
 
         Evaluation evaluation = new Evaluation(batch, imageReference);
         for (ClassificationResult result : results) {
@@ -91,6 +88,11 @@ public class EvaluationService {
             evaluation.addPoint(fishPart, result.ntcCategory, result.confidence);
         }
         Evaluation saved = evaluationRepository.save(evaluation);
+
+        if (BatchStatus.OPEN.equals(batch.getStatus().getCode())) {
+            batch.startEvaluation(findStatus(BatchStatus.IN_EVALUATION));
+            batchRepository.save(batch);
+        }
 
         logService.recordEvent(UNIT_EVALUATED_EVENT, ownerId, batch.getId(), saved.getId(),
                 "Unidad " + (evaluationCount + 1) + " del lote " + batch.getCode() + " evaluada");

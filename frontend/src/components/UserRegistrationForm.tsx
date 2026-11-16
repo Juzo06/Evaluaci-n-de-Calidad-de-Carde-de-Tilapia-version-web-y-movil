@@ -1,5 +1,7 @@
 import { useState } from "react";
 import type { ChangeEvent, SyntheticEvent } from "react";
+import { useI18n } from "../i18n/I18nContext";
+import { localizeErrorMessage } from "../i18n/translations";
 import type { RegisterUserFormField, RegisterUserFormValues, RegisterUserRequestDTO } from "../types/auth";
 import { ApiError } from "../services/apiClient";
 import { toRegisterUserRequest, validateAuthForm } from "../validation/authValidation";
@@ -29,6 +31,7 @@ const knownFields: RegisterUserFormField[] = [
 ];
 
 export default function UserRegistrationForm({ onSubmit }: UserRegistrationFormProps) {
+  const { locale, t } = useI18n();
   const [values, setValues] = useState<RegisterUserFormValues>(emptyValues);
   const [errors, setErrors] = useState<AuthFormErrors>({});
   const [formError, setFormError] = useState<string | null>(null);
@@ -66,7 +69,7 @@ export default function UserRegistrationForm({ onSubmit }: UserRegistrationFormP
         setErrors(serverErrors);
         setFormError(error.message);
       } else {
-        setFormError("Ocurrió un error inesperado al registrar el usuario. Intenta de nuevo.");
+        setFormError(t("userForm.unexpectedError"));
       }
     } finally {
       setIsSubmitting(false);
@@ -78,23 +81,29 @@ export default function UserRegistrationForm({ onSubmit }: UserRegistrationFormP
     if (!message) return null;
     return (
       <small id={`${field}Error`} role="alert" className="text-red-600 font-semibold text-xs mt-1">
-        {message}
+        {localizeErrorMessage(message, locale)}
       </small>
     );
   }
 
-  function describedBy(field: RegisterUserFormField): string {
-    return errors[field] ? `${field}Error` : `${field}Hint`;
+  function describedBy(field: RegisterUserFormField): string | undefined {
+    if (errors[field]) {
+      return `${field}Error`;
+    }
+    if (field === "email" || field === "phone" || field === "password") {
+      return `${field}Hint`;
+    }
+    return undefined;
   }
 
   return (
     <div className="w-full">
       <header className="mb-6">
         <h2 id="form-title" className="text-3xl sm:text-4xl font-serif font-bold text-[#0d3b66]">
-          Registrar usuario
+          {t("userForm.title")}
         </h2>
         <p className="text-[#5b738b] text-sm mt-1">
-          Para gestionar tus lotes y evaluaciones.
+          {t("userForm.subtitle")}
         </p>
       </header>
 
@@ -102,7 +111,7 @@ export default function UserRegistrationForm({ onSubmit }: UserRegistrationFormP
         onSubmit={handleSubmit}
         noValidate
         className="flex flex-col gap-4 w-full"
-        aria-label="Formulario de registro de usuario"
+        aria-label={t("userForm.formAria")}
       >
         {formError && (
           <aside
@@ -124,7 +133,7 @@ export default function UserRegistrationForm({ onSubmit }: UserRegistrationFormP
                 d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
               />
             </svg>
-            <span>{formError}</span>
+            <span>{localizeErrorMessage(formError, locale, "userForm.unexpectedError")}</span>
           </aside>
         )}
 
@@ -133,13 +142,13 @@ export default function UserRegistrationForm({ onSubmit }: UserRegistrationFormP
           className="p-0 m-0 border-0 flex flex-col gap-4"
           style={{ display: "flex", flexDirection: "column" }}
         >
-          <legend className="sr-only">Información personal y de contacto</legend>
+          <legend className="sr-only">{t("userForm.personalLegend")}</legend>
 
           {/* Fila 1: Nombres y Apellidos */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full">
             <div className="flex flex-col gap-1.5">
               <label htmlFor="firstName" className="text-sm font-medium text-[#0d3b66]">
-                Nombres
+                {t("userForm.firstNameLabel")}
               </label>
               <input
                 id="firstName"
@@ -147,7 +156,7 @@ export default function UserRegistrationForm({ onSubmit }: UserRegistrationFormP
                 type="text"
                 required
                 autoComplete="given-name"
-                placeholder="Máximo 50 caracteres"
+                placeholder={t("userForm.firstNamePlaceholder")}
                 value={values.firstName}
                 onChange={handleChange}
                 aria-invalid={Boolean(errors.firstName)}
@@ -161,7 +170,7 @@ export default function UserRegistrationForm({ onSubmit }: UserRegistrationFormP
 
             <div className="flex flex-col gap-1.5">
               <label htmlFor="lastName" className="text-sm font-medium text-[#0d3b66]">
-                Apellidos
+                {t("userForm.lastNameLabel")}
               </label>
               <input
                 id="lastName"
@@ -169,7 +178,7 @@ export default function UserRegistrationForm({ onSubmit }: UserRegistrationFormP
                 type="text"
                 required
                 autoComplete="family-name"
-                placeholder="Máximo 50 caracteres"
+                placeholder={t("userForm.lastNamePlaceholder")}
                 value={values.lastName}
                 onChange={handleChange}
                 aria-invalid={Boolean(errors.lastName)}
@@ -186,7 +195,7 @@ export default function UserRegistrationForm({ onSubmit }: UserRegistrationFormP
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full">
             <div className="flex flex-col gap-1.5">
               <label htmlFor="email" className="text-sm font-medium text-[#0d3b66]">
-                Correo electrónico
+                {t("userForm.emailLabel")}
               </label>
               <input
                 id="email"
@@ -194,7 +203,7 @@ export default function UserRegistrationForm({ onSubmit }: UserRegistrationFormP
                 type="email"
                 required
                 autoComplete="email"
-                placeholder="nombre@correo.com"
+                placeholder={t("userForm.emailPlaceholder")}
                 value={values.email}
                 onChange={handleChange}
                 aria-invalid={Boolean(errors.email)}
@@ -204,14 +213,14 @@ export default function UserRegistrationForm({ onSubmit }: UserRegistrationFormP
                 }`}
               />
               <small id="emailHint" className="text-xs text-[#5b738b] mt-0.5">
-                Máximo 100 caracteres. Con él iniciarás sesión.
+                {t("userForm.emailHint")}
               </small>
               {renderError("email")}
             </div>
 
             <div className="flex flex-col gap-1.5">
               <label htmlFor="phone" className="text-sm font-medium text-[#0d3b66]">
-                Teléfono celular
+                {t("userForm.phoneLabel")}
               </label>
               <input
                 id="phone"
@@ -219,7 +228,7 @@ export default function UserRegistrationForm({ onSubmit }: UserRegistrationFormP
                 type="tel"
                 required
                 autoComplete="tel"
-                placeholder="3001234567"
+                placeholder={t("userForm.phonePlaceholder")}
                 value={values.phone}
                 onChange={handleChange}
                 aria-invalid={Boolean(errors.phone)}
@@ -229,7 +238,7 @@ export default function UserRegistrationForm({ onSubmit }: UserRegistrationFormP
                 }`}
               />
               <small id="phoneHint" className="text-xs text-[#5b738b] mt-0.5">
-                10 dígitos, inicia en 3
+                {t("userForm.phoneHint")}
               </small>
               {renderError("phone")}
             </div>
@@ -241,13 +250,13 @@ export default function UserRegistrationForm({ onSubmit }: UserRegistrationFormP
           className="p-0 m-0 border-0 flex flex-col gap-4"
           style={{ display: "flex", flexDirection: "column" }}
         >
-          <legend className="sr-only">Credenciales de seguridad</legend>
+          <legend className="sr-only">{t("userForm.securityLegend")}</legend>
 
           {/* Fila 3: Contraseña y Confirmar contraseña */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full">
             <div className="flex flex-col gap-1.5">
               <label htmlFor="password" className="text-sm font-medium text-[#0d3b66]">
-                Contraseña
+                {t("userForm.passwordLabel")}
               </label>
               <input
                 id="password"
@@ -265,14 +274,14 @@ export default function UserRegistrationForm({ onSubmit }: UserRegistrationFormP
                 }`}
               />
               <small id="passwordHint" className="text-xs text-[#5b738b] mt-0.5">
-                8 a 20 caracteres
+                {t("userForm.passwordHint")}
               </small>
               {renderError("password")}
             </div>
 
             <div className="flex flex-col gap-1.5">
               <label htmlFor="confirmPassword" className="text-sm font-medium text-[#0d3b66]">
-                Confirmar contraseña
+                {t("userForm.confirmPasswordLabel")}
               </label>
               <input
                 id="confirmPassword"
@@ -324,22 +333,22 @@ export default function UserRegistrationForm({ onSubmit }: UserRegistrationFormP
                   d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
                 />
               </svg>
-              <span>Creando cuenta...</span>
+              <span>{t("userForm.submitting")}</span>
             </>
           ) : (
-            "Crear cuenta"
+            t("userForm.submit")
           )}
         </button>
 
         {/* Enlace inferior */}
         <footer className="mt-4 text-center text-sm text-[#5b738b]">
-          ¿Ya tienes cuenta?{" "}
+          {t("userForm.hasAccount")}{" "}
           <a
             href="#/login"
             id="register-to-login-link"
             className="text-[#094b72] font-semibold underline underline-offset-4 hover:text-[#073a5a]"
           >
-            Inicia sesión
+            {t("userForm.loginLink")}
           </a>
         </footer>
       </form>

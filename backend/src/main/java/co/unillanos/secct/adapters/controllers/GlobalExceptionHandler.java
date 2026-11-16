@@ -12,6 +12,7 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 import java.util.List;
@@ -48,11 +49,57 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(exception.getHttpStatus()).body(ErrorResponseDTO.of(exception.getMessage()));
     }
 
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<ErrorResponseDTO> handleTypeMismatch(MethodArgumentTypeMismatchException exception) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ErrorResponseDTO.of("Parámetro inválido: " + exception.getName()));
+    }
+
     @ExceptionHandler(DataIntegrityViolationException.class)
-    public ResponseEntity<ErrorResponseDTO> handleConflict(DataIntegrityViolationException exception) {
-        logger.warn("Data integrity violation: {}", exception.getMostSpecificCause().getMessage());
+    public ResponseEntity<ErrorResponseDTO> handleConflict(DataIntegrityViolationException exception,
+                                                           jakarta.servlet.http.HttpServletRequest request) {
+        String causeMsg = exception.getMostSpecificCause() != null
+                ? exception.getMostSpecificCause().getMessage().toLowerCase(java.util.Locale.ROOT)
+                : "";
+        logger.warn("Data integrity violation on {}: {}", request != null ? request.getRequestURI() : "", causeMsg);
+
+        if (causeMsg.contains("usuario_correo") || causeMsg.contains("correo") || causeMsg.contains("email")) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(ErrorResponseDTO.of("correo ya registrado"));
+        }
+        if (causeMsg.contains("uq_evaluacion_imagen") || causeMsg.contains("id_imagen")
+                || causeMsg.contains("referencia_imagen") || causeMsg.contains("uq_evaluacion_lote_imagen")) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(ErrorResponseDTO.of(
+                    "Esta imagen ya fue evaluada anteriormente. Carga una imagen distinta."));
+        }
+        if (causeMsg.contains("uq_reporte_vigente") || causeMsg.contains("uq_reporte_lote_version")) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(ErrorResponseDTO.of(
+                    "Ya existe un reporte vigente o duplicado para este lote."));
+        }
+        if (causeMsg.contains("lote_codigo") || causeMsg.contains("codigo")) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(ErrorResponseDTO.of(
+                    "No se pudo generar un código único para el lote. Intenta de nuevo."));
+        }
+
+        String uri = request != null && request.getRequestURI() != null ? request.getRequestURI() : "";
+        if (uri.contains("/users") || uri.contains("/registro")) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(ErrorResponseDTO.of(
+                    "No se pudo completar el registro por un conflicto de datos. Intenta de nuevo"));
+        }
+        if (uri.contains("/evaluations")) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(ErrorResponseDTO.of(
+                    "No se pudo completar la evaluación por un conflicto de datos. Intenta de nuevo"));
+        }
+        if (uri.contains("/reports")) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(ErrorResponseDTO.of(
+                    "No se pudo completar el reporte por un conflicto de datos. Intenta de nuevo"));
+        }
+        if (uri.contains("/batches")) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(ErrorResponseDTO.of(
+                    "No se pudo guardar el lote por un conflicto de datos. Intenta de nuevo"));
+        }
+
         return ResponseEntity.status(HttpStatus.CONFLICT).body(ErrorResponseDTO.of(
-                "No se pudo guardar el lote por un conflicto de datos. Intenta de nuevo"));
+                "Conflicto de integridad de datos. La operación no pudo completarse."));
     }
 
     @ExceptionHandler(Exception.class)

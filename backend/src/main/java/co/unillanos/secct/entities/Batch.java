@@ -1,5 +1,6 @@
 package co.unillanos.secct.entities;
 
+import co.unillanos.secct.usecases.exceptions.BusinessException;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -104,6 +105,61 @@ public class Batch {
         }
         this.finalClassification = finalClassification;
         this.status = evaluated;
+    }
+
+    /** True when the batch has already been closed as EVALUADO or REPORTADO. */
+    public boolean isEvaluated() {
+        String statusCode = status.getCode();
+        return BatchStatus.EVALUATED.equals(statusCode) || BatchStatus.REPORTED.equals(statusCode);
+    }
+
+    /** True only when the batch is in EVALUADO and does not yet have a current report. */
+    public boolean canBeReported() {
+        return BatchStatus.EVALUATED.equals(status.getCode());
+    }
+
+    /** True when the batch currently has status REPORTADO. */
+    public boolean isReported() {
+        return BatchStatus.REPORTED.equals(status.getCode());
+    }
+
+    /** Transitions an EVALUADO batch to REPORTADO when saving a report version. */
+    public void markReported(BatchStatus reported) {
+        if (!canBeReported()) {
+            throw new BusinessException("El lote no se puede reportar en su estado actual", 409);
+        }
+        this.status = reported;
+    }
+
+    /** Reverts a REPORTADO batch back to EVALUADO after its current report is deleted. */
+    public void revertToEvaluated(BatchStatus evaluated) {
+        this.status = evaluated;
+    }
+
+    /**
+     * Expands the sample size of an evaluated/reported batch and reopens it in EN_EVALUACION
+     * with finalClassification cleared to satisfy ck_lote_estado_clasificacion.
+     */
+    public void expandSample(Integer additionalUnits, BatchStatus inEvaluation) {
+        if (!isEvaluated()) {
+            throw new BusinessException("Solo se puede ampliar un lote evaluado", 409);
+        }
+        if (additionalUnits == null || additionalUnits < 1) {
+            throw new BusinessException("Las unidades adicionales deben ser entre 1 y 499", 400);
+        }
+        if (this.sampleUnitCount + additionalUnits > 500) {
+            throw new BusinessException("La muestra no puede superar 500 unidades", 400);
+        }
+        this.sampleUnitCount += additionalUnits;
+        this.status = inEvaluation;
+        this.finalClassification = null;
+    }
+
+    /** Marks the batch as logically deleted. */
+    public void softDelete(Integer userId) {
+        this.isDeleted = true;
+        this.deletedAt = OffsetDateTime.now();
+        this.deletedBy = userId;
     }
 
     @PrePersist

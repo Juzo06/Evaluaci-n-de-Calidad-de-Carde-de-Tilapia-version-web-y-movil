@@ -2,16 +2,21 @@ package co.unillanos.secct.usecases.services;
 
 import co.unillanos.secct.entities.Batch;
 import co.unillanos.secct.entities.BatchStatus;
+import co.unillanos.secct.entities.Report;
 import co.unillanos.secct.entities.User;
 import co.unillanos.secct.infrastructure.repositories.BatchRepository;
 import co.unillanos.secct.infrastructure.repositories.BatchEvaluationCount;
 import co.unillanos.secct.infrastructure.repositories.BatchStatusRepository;
 import co.unillanos.secct.infrastructure.repositories.EvaluationRepository;
+import co.unillanos.secct.infrastructure.repositories.ReportRepository;
 import co.unillanos.secct.infrastructure.repositories.UserRepository;
 import co.unillanos.secct.usecases.dto.BatchResponseDTO;
+import co.unillanos.secct.usecases.dto.ExpandSampleRequestDTO;
 import co.unillanos.secct.usecases.dto.RegisterBatchRequestDTO;
 import co.unillanos.secct.usecases.exceptions.BusinessException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
@@ -26,42 +31,48 @@ public class BatchService {
     private static final String INITIAL_STATUS_CODE = "ABIERTO";
     private static final String BATCH_REGISTERED_EVENT = "BATCH_REGISTERED";
     private static final String EVALUATED_BATCHES_VIEWED_EVENT = "EVALUATED_BATCHES_VIEWED";
+    private static final String BATCH_DELETED_EVENT = "BATCH_DELETED";
+    private static final String SAMPLE_EXPANDED_EVENT = "SAMPLE_EXPANDED";
 
     private final UserRepository userRepository;
     private final BatchStatusRepository statusRepository;
     private final BatchRepository batchRepository;
     private final EvaluationRepository evaluationRepository;
+    private final ReportRepository reportRepository;
     private final BatchCodeGenerator codeGenerator;
     private final LogService logService;
 
+    @Autowired
     public BatchService(UserRepository userRepository,
                         BatchStatusRepository statusRepository,
                         BatchRepository batchRepository,
                         EvaluationRepository evaluationRepository,
+                        ReportRepository reportRepository,
                         BatchCodeGenerator codeGenerator,
                         LogService logService) {
         this.userRepository = userRepository;
         this.statusRepository = statusRepository;
         this.batchRepository = batchRepository;
         this.evaluationRepository = evaluationRepository;
+        this.reportRepository = reportRepository;
         this.codeGenerator = codeGenerator;
         this.logService = logService;
     }
 
-    @Transactional
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public BatchResponseDTO register(RegisterBatchRequestDTO request, Integer ownerId) {
-        User owner = userRepository.findById(ownerId)
+        User owner = userRepository.findByIdAndIsDeletedFalse(ownerId)
                 .orElseThrow(() -> new BusinessException("Usuario no encontrado", 401));
 
         BatchStatus status = statusRepository.findByCode(INITIAL_STATUS_CODE)
                 .orElseThrow(() -> new BusinessException(
                         "El estado " + INITIAL_STATUS_CODE + " no está configurado", 500));
 
-        long dailyCount = batchRepository.countByCaptureDate(request.captureDate);
-        String code = codeGenerator.generate(request.captureDate, dailyCount + 1);
+        long dailyCount = batchRepository.countByCaptureDate(request.getCaptureDate());
+        String code = codeGenerator.generate(request.getCaptureDate(), dailyCount + 1);
 
-        Batch batch = new Batch(code, request.captureDate, request.weightKg, request.sampleUnitCount,
-                request.notes, owner, status);
+        Batch batch = new Batch(code, request.getCaptureDate(), request.getWeightKg(), request.getSampleUnitCount(),
+                request.getNotes(), owner, status);
         Batch saved = batchRepository.save(batch);
 
         logService.recordEvent(BATCH_REGISTERED_EVENT, ownerId, saved.getId(), null,
@@ -91,9 +102,71 @@ public class BatchService {
 
     @Transactional(readOnly = true)
     public BatchResponseDTO getByCodeAndOwner(String code, Integer ownerId) {
-        Batch batch = batchRepository.findByCodeAndOwnerIdAndIsDeletedFalse(code, ownerId)
-                .orElseThrow(() -> new BusinessException("Lote no encontrado", 404));
+        Batch batch = findOwnBatch(code, ownerId);
         return BatchResponseDTO.from(batch, evaluationRepository.countByBatchId(batch.getId()));
+    }
+
+    /** HU-09: Logically deletes an own batch in any status along with its active reports (DS-HU9). */
+    @Transactional(isolation = Isolation.READ_COMMITTED)
+    public void delete(String code, Integer ownerId) {
+        Batch batch = findOwnBatch(code, ownerId);
+
+        batch.softDelete(ownerId);
+        batchRepository.save(batch);
+
+        List<Report> reports = reportRepository.findByBatchIdAndIsDeletedFalse(batch.getId());
+        if (!reports.isEmpty()) {
+            for (Report report : reports) {
+                report.softDelete(ownerId);
+            }
+            reportRepository.saveAll(reports);
+        }
+
+        logService.recordEvent(BATCH_DELETED_EVENT, ownerId, batch.getId(), null,
+                "Lote " + batch.getCode() + " eliminado");
+    }
+
+    /**
+     * HU-13: Expands the sample unit count of an evaluated or reported batch, marking any current report
+     * as historical and reopening the batch in EN_EVALUACION (DS-HU13).
+     */
+    @Transactional(isolation = Isolation.READ_COMMITTED)
+    public BatchResponseDTO expandSample(String code, Integer ownerId, ExpandSampleRequestDTO request) {
+        Batch batch = findOwnBatch(code, ownerId);
+
+        if (!batch.isEvaluated()) {
+            throw new BusinessException("Solo se puede ampliar un lote evaluado", 409);
+        }
+
+        if (batch.isReported()) {
+            reportRepository.findByBatchIdAndCurrentTrueAndIsDeletedFalse(batch.getId())
+                    .ifPresent(report -> {
+                        report.markAsPrevious();
+                        reportRepository.save(report);
+                    });
+        }
+
+        BatchStatus inEvaluation = statusRepository.findByCode(BatchStatus.IN_EVALUATION)
+                .orElseThrow(() -> new BusinessException(
+                        "El estado " + BatchStatus.IN_EVALUATION + " no está configurado", 500));
+
+        Integer additionalUnits = request != null ? request.getAdditionalUnits() : null;
+        batch.expandSample(additionalUnits, inEvaluation);
+        Batch savedBatch = batchRepository.save(batch);
+
+        long evaluationCount = evaluationRepository.countByBatchId(batch.getId());
+        logService.recordEvent(SAMPLE_EXPANDED_EVENT, ownerId, batch.getId(), null,
+                "Muestra del lote " + batch.getCode() + " ampliada en " + additionalUnits + " unidades");
+
+        return BatchResponseDTO.from(savedBatch, evaluationCount);
+    }
+
+    private Batch findOwnBatch(String code, Integer ownerId) {
+        if (ownerId == null) {
+            throw new BusinessException("Usuario no autenticado", 401);
+        }
+        return batchRepository.findByCodeAndOwnerIdAndIsDeletedFalse(code, ownerId)
+                .orElseThrow(() -> new BusinessException("Lote no encontrado", 404));
     }
 
     /**
@@ -105,14 +178,14 @@ public class BatchService {
      * - Always records audit event EVALUATED_BATCHES_VIEWED (PL-5.08, PI-13).
      * - Returns List<BatchResponseDTO>.
      */
-    @Transactional
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public List<BatchResponseDTO> listEvaluated(Integer ownerId) {
         if (ownerId == null) {
             throw new BusinessException("Usuario no autenticado", 401);
         }
 
-        List<Batch> batches = batchRepository.findByOwnerIdAndStatusCodeAndIsDeletedFalse(
-                ownerId, BatchStatus.EVALUATED);
+        List<Batch> batches = batchRepository.findByOwnerIdAndStatusCodeInAndIsDeletedFalse(
+                ownerId, List.of(BatchStatus.EVALUATED, BatchStatus.REPORTED));
 
         Map<Integer, Long> countsByBatchId;
         if (batches.isEmpty()) {

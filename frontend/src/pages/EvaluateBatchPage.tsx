@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import BatchSelector from "../components/BatchSelector";
 import UnitImageForm from "../components/UnitImageForm";
 import UnitResultsCard from "../components/UnitResultsCard";
+import { useI18n } from "../i18n/I18nContext";
+import { localizeErrorMessage } from "../i18n/translations";
 import { ApiError } from "../services/apiClient";
 import { getBatchByCode, listAvailableBatches } from "../services/batchService";
 import { closeEvaluation as requestCloseEvaluation, evaluateUnit } from "../services/evaluationService";
@@ -12,11 +14,22 @@ import type { EvaluatedUnitRow } from "../types/evaluation";
 
 const errorStyle = { color: "#b42318", fontWeight: 600 };
 
-function toMessage(error: unknown): string {
-  return error instanceof ApiError ? error.message : "Ocurrió un error inesperado. Intenta de nuevo.";
+function toMessage(error: unknown, fallback: string): string {
+  return error instanceof ApiError ? error.message : fallback;
+}
+
+function getBatchCodeFromHash(): string | null {
+  const queryIndex = window.location.hash.indexOf("?");
+  if (queryIndex === -1) {
+    return null;
+  }
+  const params = new URLSearchParams(window.location.hash.slice(queryIndex + 1));
+  const code = params.get("code")?.trim();
+  return code && code.length > 0 ? code : null;
 }
 
 export default function EvaluateBatchPage() {
+  const { locale, t } = useI18n();
   const [batches, setBatches] = useState<BatchResponseDTO[]>([]);
   const [isLoadingBatches, setIsLoadingBatches] = useState(true);
   const [selectedBatch, setSelectedBatch] = useState<BatchResponseDTO | null>(null);
@@ -28,6 +41,19 @@ export default function EvaluateBatchPage() {
 
   useEffect(() => {
     void loadAvailableBatches();
+    const initialCode = getBatchCodeFromHash();
+    if (initialCode) {
+      void selectBatch(initialCode);
+    }
+
+    const handleHashChange = () => {
+      const code = getBatchCodeFromHash();
+      if (code) {
+        void selectBatch(code);
+      }
+    };
+    window.addEventListener("hashchange", handleHashChange);
+    return () => window.removeEventListener("hashchange", handleHashChange);
   }, []);
 
   async function loadAvailableBatches(): Promise<void> {
@@ -35,7 +61,7 @@ export default function EvaluateBatchPage() {
     try {
       setBatches(await listAvailableBatches());
     } catch (error) {
-      setPageError(toMessage(error));
+      setPageError(toMessage(error, t("app.unexpectedError")));
     } finally {
       setIsLoadingBatches(false);
     }
@@ -53,7 +79,7 @@ export default function EvaluateBatchPage() {
       setSelectedBatch(await getBatchByCode(code));
     } catch (error) {
       setSelectedBatch(null);
-      setPageError(toMessage(error));
+      setPageError(toMessage(error, t("app.unexpectedError")));
     }
   }
 
@@ -69,7 +95,7 @@ export default function EvaluateBatchPage() {
       setRows((current) => [...current, { unitNumber: refreshedBatch.evaluationCount, evaluation }]);
       return true;
     } catch (error) {
-      setPageError(toMessage(error));
+      setPageError(toMessage(error, t("app.unexpectedError")));
       return false;
     } finally {
       setIsUploading(false);
@@ -85,7 +111,7 @@ export default function EvaluateBatchPage() {
       setClosedBatch(batch);
       await loadAvailableBatches();
     } catch (error) {
-      setPageError(toMessage(error));
+      setPageError(toMessage(error, t("app.unexpectedError")));
     } finally {
       setIsClosing(false);
     }
@@ -101,31 +127,32 @@ export default function EvaluateBatchPage() {
   const userFullName = getUserFullName();
 
   return (
-    <div className="app min-h-screen">
+    <div className="min-h-dvh w-full max-w-full overflow-x-hidden flex flex-col md:flex-row bg-[#f4f8fb]">
       <SideNav current="evaluate" />
-      <main id="main-content" className="main">
-        <header className="top">
+      <main id="main-content" className="flex-1 min-w-0 w-full max-w-full p-4 sm:p-6 lg:p-10 flex flex-col gap-5">
+        <header className="top flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 w-full">
           <hgroup>
-            <h1 id="evaluate-batch-title" style={{ fontSize: "36px" }}>Evaluar lote</h1>
-            <p style={{ margin: "4px 0 0" }}>Carga una imagen por unidad y el sistema la clasifica.</p>
+            <h1 id="evaluate-batch-title" className="text-2xl sm:text-3xl lg:text-[36px] font-serif leading-tight">
+              {t("eval.title")}
+            </h1>
+            <p style={{ margin: "4px 0 0" }}>{t("eval.subtitle")}</p>
           </hgroup>
-          <span aria-label="Usuario autenticado" className="bg-[#e6eff6] text-[#094b72] px-4 py-1.5 rounded-full text-xs font-semibold shadow-sm">
+          <span aria-label={t("app.authenticatedUser")} className="self-start sm:self-auto shrink-0 max-w-full truncate bg-[#e6eff6] text-[#094b72] px-4 py-1.5 rounded-full text-xs font-semibold shadow-sm">
             {userFullName}
           </span>
         </header>
         {pageError && (
           <aside role="alert" aria-live="assertive">
-            <small style={errorStyle}>{pageError}</small>
+            <small style={errorStyle}>{localizeErrorMessage(pageError, locale, "app.unexpectedError")}</small>
           </aside>
         )}
-        <div style={{ display: "flex", gap: "20px" }}>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full min-w-0 items-start">
           <section
             aria-labelledby="batch-selection-title"
-            className="card"
-            style={{ width: "420px", display: "flex", flexDirection: "column", gap: "20px", alignSelf: "flex-start" }}
+            className="card min-w-0 w-full p-4 sm:p-6 rounded-2xl bg-white border border-[#d5e3ee] shadow-sm flex flex-col gap-5"
           >
             <header className="sr-only">
-              <h2 id="batch-selection-title">Selección de lote y carga de muestra</h2>
+              <h2 id="batch-selection-title">{t("eval.sectionAria")}</h2>
             </header>
             <BatchSelector
               batches={batches}
@@ -142,7 +169,7 @@ export default function EvaluateBatchPage() {
               onSubmit={(image) => (selectedBatch ? submitUnitEvaluation(selectedBatch.code, image) : Promise.resolve(false))}
             />
           </section>
-          <section aria-labelledby="unit-results-title" style={{ flex: 1, display: "flex" }}>
+          <section aria-labelledby="unit-results-title" className="min-w-0 w-full flex">
             <UnitResultsCard
               rows={rows}
               canClose={canClose}

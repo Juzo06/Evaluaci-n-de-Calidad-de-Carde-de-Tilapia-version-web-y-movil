@@ -38,3 +38,12 @@ export interface BatchFormValues {
 }
 
 export type BatchFormField = keyof BatchFormValues;
+
+/** Request body of POST /api/batches/{code}/expand according to DC-HU13. */
+export interface ExpandSampleRequestDTO {
+  additionalUnits: number;
+}
+
+export interface ExpandFormErrors {
+  additionalUnits?: string;
+}

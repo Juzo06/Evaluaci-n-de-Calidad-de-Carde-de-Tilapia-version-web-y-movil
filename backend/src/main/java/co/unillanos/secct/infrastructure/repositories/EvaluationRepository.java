@@ -14,6 +14,8 @@ public interface EvaluationRepository extends JpaRepository<Evaluation, Integer>
 
     long countByBatchId(Integer batchId);
 
+    boolean existsByImageReference(String imageReference);
+
     boolean existsByBatchIdAndImageReference(Integer batchId, String imageReference);
 
     @Query("select new co.unillanos.secct.infrastructure.repositories.BatchEvaluationCount(e.batch.id, count(e)) "
@@ -22,4 +24,8 @@ public interface EvaluationRepository extends JpaRepository<Evaluation, Integer>
 
     @Query("select cast(avg(p.ntcCategory) as BigDecimal) from EvaluationPoint p where p.evaluation.batch.id = :batchId")
     BigDecimal averageNtcCategoryByBatchId(@Param("batchId") Integer batchId);
+
+    long countByBatchIsDeletedFalse();
+
+    List<Evaluation> findByBatchId(Integer batchId);
 }

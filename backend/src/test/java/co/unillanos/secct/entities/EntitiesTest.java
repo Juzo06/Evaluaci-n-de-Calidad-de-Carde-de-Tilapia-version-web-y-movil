@@ -1,11 +1,18 @@
 package co.unillanos.secct.entities;
 
+import co.unillanos.secct.usecases.dto.ReportStatistics;
+import co.unillanos.secct.usecases.exceptions.BusinessException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.test.util.ReflectionTestUtils;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.OffsetDateTime;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class EntitiesTest {
 
@@ -83,6 +90,13 @@ class EntitiesTest {
         Log prePersistLog = new Log();
         prePersistLog.onPersist();
         assertThat(prePersistLog.getOccurredAt()).isNotNull();
+
+        Log fiveArgLog = new Log(null, 10, 20, 30, "Evento de auditoría");
+        assertThat(fiveArgLog.getUserId()).isEqualTo(10);
+        assertThat(fiveArgLog.getBatchId()).isEqualTo(20);
+        assertThat(fiveArgLog.getEvaluationId()).isEqualTo(30);
+        assertThat(fiveArgLog.getDescription()).isEqualTo("Evento de auditoría");
+        assertThat(fiveArgLog.getOccurredAt()).isNotNull();
     }
 
     @Test
@@ -129,5 +143,122 @@ class EntitiesTest {
 
         defaultUser.onUpdate();
         assertThat(defaultUser.getUpdatedAt()).isNotNull();
+
+        user.softDelete(1);
+        assertThat(user.isDeleted()).isTrue();
+        assertThat(user.isActive()).isFalse();
+        assertThat(user.getDeletedAt()).isNotNull();
+        assertThat(user.getDeletedBy()).isEqualTo(1);
+    }
+
+    @Test
+    @DisplayName("Batch entity: estados, markReported, revertToEvaluated, expandSample y softDelete")
+    void testBatchDomainMethods() {
+        Role role = new Role((short) 2, "PISCICULTOR");
+        User owner = new User(role, "Carlos", "Pérez", "carlos@correo.com", "3101234567", "hash", "salt");
+        BatchStatus open = new BatchStatus((short) 1, BatchStatus.OPEN);
+        BatchStatus inEvaluation = new BatchStatus((short) 2, BatchStatus.IN_EVALUATION);
+        BatchStatus evaluated = new BatchStatus((short) 3, BatchStatus.EVALUATED);
+        BatchStatus reported = new BatchStatus((short) 4, BatchStatus.REPORTED);
+
+        Batch batch = new Batch("SECCT-20261020-001", LocalDate.of(2026, 10, 20),
+                new BigDecimal("100.00"), 10, "Estanque 1", owner, open);
+
+        assertThat(batch.isEvaluated()).isFalse();
+        assertThat(batch.canBeReported()).isFalse();
+        assertThat(batch.isReported()).isFalse();
+
+        assertThatThrownBy(() -> batch.markReported(reported))
+                .isInstanceOf(BusinessException.class)
+                .extracting(e -> ((BusinessException) e).getHttpStatus())
+                .isEqualTo(409);
+
+        assertThatThrownBy(() -> batch.expandSample(2, inEvaluation))
+                .isInstanceOf(BusinessException.class)
+                .extracting(e -> ((BusinessException) e).getHttpStatus())
+                .isEqualTo(409);
+
+        batch.startEvaluation(inEvaluation);
+        batch.close(new BigDecimal("3.75"), evaluated);
+        assertThat(batch.isEvaluated()).isTrue();
+        assertThat(batch.canBeReported()).isTrue();
+        assertThat(batch.isReported()).isFalse();
+
+        batch.markReported(reported);
+        assertThat(batch.isEvaluated()).isTrue();
+        assertThat(batch.canBeReported()).isFalse();
+        assertThat(batch.isReported()).isTrue();
+
+        assertThatThrownBy(() -> batch.expandSample(0, inEvaluation))
+                .isInstanceOf(BusinessException.class)
+                .extracting(e -> ((BusinessException) e).getHttpStatus())
+                .isEqualTo(400);
+
+        assertThatThrownBy(() -> batch.expandSample(491, inEvaluation))
+                .isInstanceOf(BusinessException.class)
+                .extracting(e -> ((BusinessException) e).getHttpStatus())
+                .isEqualTo(400);
+
+        batch.expandSample(5, inEvaluation);
+        assertThat(batch.getSampleUnitCount()).isEqualTo(15);
+        assertThat(batch.getStatus()).isEqualTo(inEvaluation);
+        assertThat(batch.getFinalClassification()).isNull();
+
+        batch.revertToEvaluated(evaluated);
+        assertThat(batch.getStatus()).isEqualTo(evaluated);
+
+        batch.softDelete(99);
+        assertThat(batch.isDeleted()).isTrue();
+        assertThat(batch.getDeletedAt()).isNotNull();
+        assertThat(batch.getDeletedBy()).isEqualTo(99);
+    }
+
+    @Test
+    @DisplayName("Report entity y ReportStatistics: constructor, serialización JSON, markAsPrevious y softDelete")
+    void testReportEntityAndStatistics() {
+        Role role = new Role((short) 2, "PISCICULTOR");
+        User owner = new User(role, "Carlos", "Pérez", "carlos@correo.com", "3101234567", "hash", "salt");
+        BatchStatus evaluated = new BatchStatus((short) 3, BatchStatus.EVALUATED);
+        Batch batch = new Batch("SECCT-20261020-001", LocalDate.of(2026, 10, 20),
+                new BigDecimal("100.00"), 3, "Notas", owner, evaluated);
+
+        ReportStatistics stats = new ReportStatistics(
+                3L,
+                new BigDecimal("3.67"),
+                new BigDecimal("4.00"),
+                new BigDecimal("3.33"),
+                Map.of((short) 1, 0L, (short) 2, 0L, (short) 3, 1L, (short) 4, 2L, (short) 5, 0L)
+        );
+
+        Report report = new Report(batch, 1, stats);
+        ReflectionTestUtils.setField(report, "id", 7);
+
+        assertThat(report.getId()).isEqualTo(7);
+        assertThat(report.getBatch()).isEqualTo(batch);
+        assertThat(report.getVersion()).isEqualTo(1);
+        assertThat(report.isCurrent()).isTrue();
+        assertThat(report.getFinalClassification()).isEqualTo(new BigDecimal("3.67"));
+        assertThat(report.getEvaluationCount()).isEqualTo(3);
+        assertThat(report.getGeneratedAt()).isNotNull();
+        assertThat(report.isDeleted()).isFalse();
+
+        ReportStatistics restored = ReportStatistics.fromJson(report.getStatistics());
+        assertThat(restored.evaluationCount()).isEqualTo(3L);
+        assertThat(restored.finalClassification()).isEqualByComparingTo("3.67");
+        assertThat(restored.countByCategory().get((short) 4)).isEqualTo(2L);
+
+        report.markAsPrevious();
+        assertThat(report.isCurrent()).isFalse();
+
+        report.softDelete(42);
+        assertThat(report.isCurrent()).isFalse();
+        assertThat(report.isDeleted()).isTrue();
+        assertThat(report.getDeletedAt()).isNotNull();
+        assertThat(report.getDeletedBy()).isEqualTo(42);
+
+        report.onCreate();
+        report.onUpdate();
+        assertThat(report.getCreatedAt()).isNotNull();
+        assertThat(report.getUpdatedAt()).isNotNull();
     }
 }

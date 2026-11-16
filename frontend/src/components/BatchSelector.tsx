@@ -1,4 +1,6 @@
 import type { ChangeEvent } from "react";
+import { useI18n } from "../i18n/I18nContext";
+import { formatUnitsCount } from "../i18n/translations";
 import type { BatchResponseDTO } from "../types/batch";
 
 interface BatchSelectorProps {
@@ -10,6 +12,7 @@ interface BatchSelectorProps {
 }
 
 export default function BatchSelector({ batches, selectedCode, isLoading, disabled, onSelect }: BatchSelectorProps) {
+  const { locale, t } = useI18n();
   const hasBatches = batches.length > 0;
 
   function handleChange(event: ChangeEvent<HTMLSelectElement>) {
@@ -17,9 +20,9 @@ export default function BatchSelector({ batches, selectedCode, isLoading, disabl
   }
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-      <label htmlFor="batchCode" style={{ fontSize: "14px" }}>
-        Lote disponible
+    <div className="flex flex-col gap-1.5 w-full min-w-0">
+      <label htmlFor="batchCode" className="text-sm">
+        {t("selector.label")}
       </label>
       <select
         id="batchCode"
@@ -28,19 +31,20 @@ export default function BatchSelector({ batches, selectedCode, isLoading, disabl
         onChange={handleChange}
         disabled={disabled || isLoading || !hasBatches}
         aria-describedby={!isLoading && !hasBatches ? "batchCodeHelp" : undefined}
+        className="w-full max-w-full min-w-0"
       >
-        {isLoading && <option value="">Cargando lotes...</option>}
-        {!isLoading && !hasBatches && <option value="">Sin resultados</option>}
-        {!isLoading && hasBatches && <option value="">Selecciona un lote</option>}
+        {isLoading && <option value="">{t("selector.loading")}</option>}
+        {!isLoading && !hasBatches && <option value="">{t("selector.empty")}</option>}
+        {!isLoading && hasBatches && <option value="">{t("selector.placeholder")}</option>}
         {batches.map((batch) => (
           <option key={batch.code} value={batch.code}>
-            {batch.code} ({batch.evaluationCount}/{batch.sampleUnitCount} unidades)
+            {batch.code} ({batch.evaluationCount}/{formatUnitsCount(batch.sampleUnitCount, locale)})
           </option>
         ))}
       </select>
       {!isLoading && !hasBatches && (
         <small id="batchCodeHelp" role="status">
-          Sin resultados: no tienes lotes disponibles para evaluar
+          {t("selector.emptyHelp")}
         </small>
       )}
     </div>
