@@ -36,16 +36,25 @@ public class LogService {
         this.eventTypeRepository = eventTypeRepository;
     }
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Transactional(propagation = Propagation.REQUIRED)
     public void recordEvent(String eventCode, Integer userId, Integer batchId, Integer evaluationId,
+                            String description) {
+        persistLog(eventCode, userId, batchId, evaluationId, description);
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void recordSecurityFailure(String eventCode, Integer userId, String description) {
+        persistLog(eventCode, userId, null, null, description);
+    }
+
+    private void persistLog(String eventCode, Integer userId, Integer batchId, Integer evaluationId,
                             String description) {
         EventType eventType = eventTypeRepository.findByCode(eventCode)
                 .orElseThrow(() -> new BusinessException("Tipo de evento no encontrado: " + eventCode, 500));
 
         String sanitizedDescription = maskSensitiveData(description);
-        OffsetDateTime now = OffsetDateTime.now();
 
-        Log log = new Log(eventType, userId, batchId, evaluationId, now, sanitizedDescription);
+        Log log = new Log(eventType, userId, batchId, evaluationId, sanitizedDescription);
         logRepository.save(log);
 
         logger.info("event={} userId={} batchId={} evaluationId={} description={}",

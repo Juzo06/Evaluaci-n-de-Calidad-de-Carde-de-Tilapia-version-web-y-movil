@@ -98,6 +98,13 @@ public class User {
         this.updatedAt = updatedAt;
     }
 
+    public void softDelete(Integer userId) {
+        this.isDeleted = true;
+        this.active = false;
+        this.deletedAt = OffsetDateTime.now();
+        this.deletedBy = userId;
+    }
+
     @PrePersist
     void onCreate() {
         OffsetDateTime now = OffsetDateTime.now();

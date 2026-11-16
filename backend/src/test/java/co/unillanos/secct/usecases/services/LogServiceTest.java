@@ -98,4 +98,27 @@ class LogServiceTest {
                 .isInstanceOf(BusinessException.class)
                 .hasMessageContaining("Tipo de evento no encontrado: UNKNOWN_EVENT");
     }
+
+    @Test
+    @DisplayName("recordSecurityFailure persiste log sin batchId ni evaluationId y enmascara datos sensibles")
+    void testRecordSecurityFailureSuccess() {
+        co.unillanos.secct.entities.EventType eventType =
+                org.mockito.Mockito.mock(co.unillanos.secct.entities.EventType.class);
+        when(eventTypeRepository.findByCode("LOGIN_FAILED")).thenReturn(Optional.of(eventType));
+
+        logService.recordSecurityFailure("LOGIN_FAILED", 42, "Intento fallido para operador@secct.co");
+
+        org.mockito.ArgumentCaptor<co.unillanos.secct.entities.Log> logCaptor =
+                org.mockito.ArgumentCaptor.forClass(co.unillanos.secct.entities.Log.class);
+        org.mockito.Mockito.verify(logRepository).save(logCaptor.capture());
+        co.unillanos.secct.entities.Log saved = logCaptor.getValue();
+
+        org.assertj.core.api.Assertions.assertThat(saved.getEventType()).isEqualTo(eventType);
+        org.assertj.core.api.Assertions.assertThat(saved.getUserId()).isEqualTo(42);
+        org.assertj.core.api.Assertions.assertThat(saved.getBatchId()).isNull();
+        org.assertj.core.api.Assertions.assertThat(saved.getEvaluationId()).isNull();
+        org.assertj.core.api.Assertions.assertThat(saved.getOccurredAt()).isNotNull();
+        org.assertj.core.api.Assertions.assertThat(saved.getDescription()).contains("***@***.***");
+        org.assertj.core.api.Assertions.assertThat(saved.getDescription()).doesNotContain("operador@secct.co");
+    }
 }

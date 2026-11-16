@@ -13,7 +13,7 @@ fieldset{border:0;padding:0;margin:0;display:grid;grid-template-columns:1fr 1fr;
 .form{flex:1;display:flex;flex-direction:column;justify-content:center;gap:16px;padding:72px 96px}
 .app{display:flex;min-height:720px;background:#f3f8fc}
 .side{width:240px;background:#094b72;color:#fff;padding:28px 16px;display:flex;flex-direction:column;gap:8px}
-.side a, aside a:not([aria-current]){color:rgba(255,255,255,0.9)!important;text-decoration:none}
+.side a, aside:not([aria-label="Herramientas de accesibilidad"]):not(#a11y-widget-root) a:not([aria-current]){color:rgba(255,255,255,0.9)!important;text-decoration:none}
 .side a[aria-current], aside a[aria-current]{background:#fff!important;color:#094b72!important;font-weight:600}
 .main{flex:1;padding:36px 44px;display:flex;flex-direction:column;gap:20px}
 .top{display:flex;justify-content:space-between;align-items:flex-start}
@@ -23,3 +23,16 @@ table{border-collapse:collapse;width:100%;font-size:14px}th{text-align:left;font
 .tag{background:#dcebf6;border-radius:99px;padding:3px 10px;font-weight:600;font-size:12px}
 .drop{border:2px dashed #8fb0c9;border-radius:16px;background:#eaf4fb;height:150px;display:flex;align-items:center;justify-content:center;text-align:center;color:#4d6a80}
 .row{display:flex;gap:12px;justify-content:flex-end}
+
+html.a11y-font-lg{font-size:112.5%}
+html.a11y-font-xl{font-size:125%}
+html.a11y-grayscale{filter:grayscale(100%)}
+html.a11y-underline-links a{text-decoration:underline!important;text-underline-offset:3px}
+html.a11y-high-contrast,html.a11y-high-contrast body{background-color:#fff!important;color:#000!important}
+html.a11y-high-contrast main,html.a11y-high-contrast section,html.a11y-high-contrast article{color:#000!important}
+html.a11y-high-contrast input,html.a11y-high-contrast select,html.a11y-high-contrast textarea{border:2px solid #000!important;background-color:#fff!important;color:#000!important}
+html.a11y-high-contrast button{border:2px solid #000!important}
+html.a11y-high-contrast .side,html.a11y-high-contrast aside:not([aria-label="Herramientas de accesibilidad"]):not(#a11y-widget-root){background-color:#002642!important}
+html.a11y-high-contrast .side a[aria-current],html.a11y-high-contrast aside:not([aria-label="Herramientas de accesibilidad"]):not(#a11y-widget-root) a[aria-current]{background-color:#fff!important;color:#000!important;outline:2px solid #000}
+html.a11y-high-contrast *:focus-visible{outline:3px solid #000!important;outline-offset:2px}
+html.a11y-reduce-motion *,html.a11y-reduce-motion *::before,html.a11y-reduce-motion *::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}

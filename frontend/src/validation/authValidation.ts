@@ -1,4 +1,9 @@
-import type { RegisterUserFormField, RegisterUserFormValues, RegisterUserRequestDTO } from "../types/auth";
+import type {
+  DeleteAccountFormErrors,
+  RegisterUserFormField,
+  RegisterUserFormValues,
+  RegisterUserRequestDTO,
+} from "../types/auth";
 
 export type AuthFormErrors = Partial<Record<RegisterUserFormField, string>>;
 
@@ -118,5 +123,25 @@ export function toLoginRequest(values: { email: string; password: string }): { e
     email: values.email.trim().toLowerCase(),
     password: values.password,
   };
+}
+
+/**
+ * Validates account deletion confirmation form according to DC-HU8 and DS-HU8.
+ */
+export function validateDeleteAccountForm(values: {
+  password: string;
+  confirmed?: boolean;
+}): DeleteAccountFormErrors {
+  const errors: DeleteAccountFormErrors = {};
+
+  if (!values.password || values.password.trim().length === 0) {
+    errors.password = "La contraseña es obligatoria";
+  }
+
+  if (values.confirmed === false) {
+    errors.confirmed = "Debes confirmar la eliminación de tu cuenta";
+  }
+
+  return errors;
 }
 

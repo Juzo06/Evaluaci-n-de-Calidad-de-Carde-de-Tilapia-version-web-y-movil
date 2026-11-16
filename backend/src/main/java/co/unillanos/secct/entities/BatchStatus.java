@@ -13,6 +13,7 @@ public class BatchStatus {
     public static final String OPEN = "ABIERTO";
     public static final String IN_EVALUATION = "EN_EVALUACION";
     public static final String EVALUATED = "EVALUADO";
+    public static final String REPORTED = "REPORTADO";
 
     @Id
     private Short id;

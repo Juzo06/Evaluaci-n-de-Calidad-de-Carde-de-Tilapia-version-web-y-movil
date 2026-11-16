@@ -1,5 +1,7 @@
 import { useRef, useState } from "react";
 import type { ChangeEvent, DragEvent, KeyboardEvent } from "react";
+import { useI18n } from "../i18n/I18nContext";
+import { localizeErrorMessage } from "../i18n/translations";
 import { validateImageFile } from "../validation/imageValidation";
 
 interface UnitImageFormProps {
@@ -13,6 +15,7 @@ interface UnitImageFormProps {
 const errorStyle = { color: "#b42318", fontWeight: 600 };
 
 export default function UnitImageForm({ classifiedCount, totalUnits, disabled, isUploading, onSubmit }: UnitImageFormProps) {
+  const { locale, t } = useI18n();
   const [file, setFile] = useState<File | null>(null);
   const [fileError, setFileError] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -63,14 +66,14 @@ export default function UnitImageForm({ classifiedCount, totalUnits, disabled, i
   }
 
   return (
-    <form style={{ display: "flex", flexDirection: "column", gap: "16px" }} onSubmit={(event) => event.preventDefault()}>
+    <form className="flex flex-col gap-4 w-full min-w-0" onSubmit={(event) => event.preventDefault()}>
       <figure
-        className="drop"
+        className="drop w-full max-w-full min-w-0"
         style={{ margin: 0, cursor: disabled ? "not-allowed" : "pointer", opacity: disabled ? 0.6 : 1, borderColor: isDragging ? "#0b4f7a" : undefined }}
         role="button"
         tabIndex={disabled ? -1 : 0}
         aria-disabled={disabled}
-        aria-label="Cargar imagen de muestra"
+        aria-label={t("unitForm.dropAria")}
         onClick={() => !disabled && inputRef.current?.click()}
         onKeyDown={handleDropKeyDown}
         onDragOver={(event) => {
@@ -80,17 +83,20 @@ export default function UnitImageForm({ classifiedCount, totalUnits, disabled, i
         onDragLeave={() => setIsDragging(false)}
         onDrop={handleDrop}
       >
-        <figcaption style={{ fontSize: "inherit", color: "inherit", textAlign: "center" }}>
+        <figcaption className="text-sm text-center px-3" style={{ color: "inherit" }}>
           {file ? (
-            <strong>{file.name}</strong>
+            <strong className="break-all">{file.name}</strong>
           ) : (
             <>
-              Arrastra una imagen aquí o selecciónala
+              {t("unitForm.dropPrompt1")}
               <br />
-              JPG o PNG, máximo 5 MB
+              {t("unitForm.dropPrompt2")}
             </>
           )}
         </figcaption>
+        <label htmlFor="unit-image-file" className="sr-only">
+          {t("unitForm.fileInputAria")}
+        </label>
         <input
           ref={inputRef}
           id="unit-image-file"
@@ -103,27 +109,27 @@ export default function UnitImageForm({ classifiedCount, totalUnits, disabled, i
       {fileError && (
         <aside role="alert" aria-live="assertive">
           <small style={errorStyle}>
-            {fileError}
+            {localizeErrorMessage(fileError, locale)}
           </small>
         </aside>
       )}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-        <output aria-live="polite" style={{ fontSize: "12px", color: "#4d6a80" }}>
-          Unidades clasificadas: {totalUnits === null ? "-" : classifiedCount} de {totalUnits ?? "-"}
-        </output>
-        {totalUnits !== null && (
+      {totalUnits !== null && (
+        <div className="flex items-center justify-between gap-2 text-xs text-[#4d6a80]">
+          <output aria-live="polite">
+            {t("unitForm.classifiedUnits", { count: classifiedCount, total: totalUnits })}
+          </output>
           <progress
             value={classifiedCount}
             max={totalUnits}
             className="sr-only"
-            aria-label="Progreso de unidades clasificadas"
+            aria-label={t("unitForm.progressAria")}
           >
-            {classifiedCount} de {totalUnits}
+            {t("unitForm.progressValue", { count: classifiedCount, total: totalUnits })}
           </progress>
-        )}
-      </div>
-      <button className="o" type="button" disabled={disabled || !file || isUploading} onClick={handleUpload}>
-        {isUploading ? "Clasificando..." : "Cargar imagen"}
+        </div>
+      )}
+      <button className="o w-full sm:w-auto" type="button" disabled={disabled || !file || isUploading} onClick={handleUpload}>
+        {isUploading ? t("unitForm.uploading") : t("unitForm.upload")}
       </button>
     </form>
   );

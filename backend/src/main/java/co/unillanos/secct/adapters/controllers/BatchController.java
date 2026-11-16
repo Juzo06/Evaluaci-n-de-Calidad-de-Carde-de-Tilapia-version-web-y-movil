@@ -1,12 +1,12 @@
 package co.unillanos.secct.adapters.controllers;
 
 import co.unillanos.secct.usecases.dto.BatchResponseDTO;
+import co.unillanos.secct.usecases.dto.ExpandSampleRequestDTO;
 import co.unillanos.secct.usecases.dto.RegisterBatchRequestDTO;
-import co.unillanos.secct.usecases.exceptions.BusinessException;
 import co.unillanos.secct.usecases.services.BatchService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -63,18 +63,23 @@ public class BatchController {
         return batchService.getByCodeAndOwner(code, ownerId);
     }
 
+    /** HU-09: logically deletes an own batch in any status alongside its active reports. */
+    @DeleteMapping("/{code}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void delete(@PathVariable String code) {
+        Integer ownerId = getAuthenticatedUserId();
+        batchService.delete(code, ownerId);
+    }
+
+    /** HU-13: expands the sample size of an evaluated or reported batch. */
+    @PostMapping("/{code}/expand")
+    public BatchResponseDTO expandSample(@PathVariable String code,
+                                         @Valid @RequestBody ExpandSampleRequestDTO request) {
+        Integer ownerId = getAuthenticatedUserId();
+        return batchService.expandSample(code, ownerId, request);
+    }
+
     private Integer getAuthenticatedUserId() {
-        var auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth == null || auth.getPrincipal() == null) {
-            throw new BusinessException("Usuario no autenticado", 401);
-        }
-        if (auth.getPrincipal() instanceof Integer id) {
-            return id;
-        }
-        try {
-            return Integer.valueOf(auth.getName());
-        } catch (NumberFormatException e) {
-            throw new BusinessException("Usuario no autenticado", 401);
-        }
+        return AuthenticatedUserHelper.getAuthenticatedUserId();
     }
 }

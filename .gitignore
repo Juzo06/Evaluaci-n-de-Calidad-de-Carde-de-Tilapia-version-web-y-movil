@@ -62,3 +62,17 @@ __pycache__/
 
 # Logs generados por iniciar_secct.sh
 .logs/
+
+# Environment variables and secrets
+.env
+.env.*
+backend/.env
+backend/.env.*
+
+# Build caches, Android artifacts, and backend logs
+frontend/tsconfig.tsbuildinfo
+frontend/android/.gradle/
+frontend/android/local.properties
+frontend/android/build/
+frontend/android/app/build/
+backend/logs/

@@ -1,11 +1,18 @@
 package co.unillanos.secct.usecases.services;
 
+import co.unillanos.secct.entities.Batch;
+import co.unillanos.secct.entities.BatchStatus;
+import co.unillanos.secct.entities.Report;
 import co.unillanos.secct.entities.Role;
 import co.unillanos.secct.entities.User;
+import co.unillanos.secct.infrastructure.repositories.BatchRepository;
+import co.unillanos.secct.infrastructure.repositories.ReportRepository;
 import co.unillanos.secct.infrastructure.repositories.RoleRepository;
 import co.unillanos.secct.infrastructure.repositories.UserRepository;
+import co.unillanos.secct.usecases.dto.DeleteAccountRequestDTO;
 import co.unillanos.secct.usecases.dto.RegisterUserRequestDTO;
 import co.unillanos.secct.usecases.dto.RegisterUserResponseDTO;
+import co.unillanos.secct.usecases.dto.ReportStatistics;
 import co.unillanos.secct.usecases.exceptions.BusinessException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -17,6 +24,10 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -37,6 +48,12 @@ class UserServiceTest {
     private RoleRepository roleRepository;
 
     @Mock
+    private BatchRepository batchRepository;
+
+    @Mock
+    private ReportRepository reportRepository;
+
+    @Mock
     private PasswordService passwordService;
 
     @Mock
@@ -46,7 +63,8 @@ class UserServiceTest {
 
     @BeforeEach
     void setUp() {
-        userService = new UserService(userRepository, roleRepository, passwordService, logService);
+        userService = new UserService(
+                userRepository, roleRepository, batchRepository, reportRepository, passwordService, logService);
     }
 
     @Test
@@ -289,5 +307,74 @@ class UserServiceTest {
         assertThatThrownBy(() -> userService.register(request))
                 .isInstanceOf(BusinessException.class)
                 .hasMessageContaining("Correo electrónico no válido");
+    }
+
+    @Test
+    @DisplayName("HU-08 deleteAccount: borra lógicamente lotes, reportes y usuario, y registra USER_DELETED")
+    void testDeleteAccount_Success() {
+        Role role = new Role((short) 2, "PISCICULTOR");
+        User user = new User(role, "Juan", "Pérez", "juan@correo.com", "3101234567", "hashed", "salt==");
+        user.setId(15);
+
+        Batch batch = new Batch("SECCT-20261020-001", LocalDate.of(2026, 10, 20),
+                new BigDecimal("100.00"), 5, null, user, new BatchStatus((short) 4, BatchStatus.REPORTED));
+        ReportStatistics stats = new ReportStatistics(
+                5L, new BigDecimal("3.50"), new BigDecimal("3.50"), new BigDecimal("3.50"), Map.of());
+        Report report = new Report(batch, 1, stats);
+
+        when(userRepository.findByIdAndIsDeletedFalse(15)).thenReturn(Optional.of(user));
+        when(passwordService.verifyPassword("MiClave2026", "salt==", "hashed")).thenReturn(true);
+        when(batchRepository.findByOwnerIdAndIsDeletedFalse(15)).thenReturn(List.of(batch));
+        when(reportRepository.findByBatchOwnerIdAndIsDeletedFalse(15)).thenReturn(List.of(report));
+
+        userService.deleteAccount(15, new DeleteAccountRequestDTO("MiClave2026"));
+
+        assertThat(batch.isDeleted()).isTrue();
+        assertThat(batch.getDeletedBy()).isEqualTo(15);
+        assertThat(report.isDeleted()).isTrue();
+        assertThat(report.isCurrent()).isFalse();
+        assertThat(report.getDeletedBy()).isEqualTo(15);
+        assertThat(user.isDeleted()).isTrue();
+        assertThat(user.isActive()).isFalse();
+        assertThat(user.getDeletedBy()).isEqualTo(15);
+
+        verify(batchRepository).saveAll(List.of(batch));
+        verify(reportRepository).saveAll(List.of(report));
+        verify(userRepository).save(user);
+        verify(logService).recordEvent(eq("USER_DELETED"), eq(15), any(), any(), any());
+    }
+
+    @Test
+    @DisplayName("HU-08 deleteAccount: lanza 404 si el usuario no existe o ya fue eliminado")
+    void testDeleteAccount_UserNotFound_Throws404() {
+        when(userRepository.findByIdAndIsDeletedFalse(99)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> userService.deleteAccount(99, new DeleteAccountRequestDTO("MiClave2026")))
+                .isInstanceOf(BusinessException.class)
+                .hasMessage("Usuario no encontrado")
+                .extracting(e -> ((BusinessException) e).getHttpStatus())
+                .isEqualTo(404);
+    }
+
+    @Test
+    @DisplayName("HU-08 deleteAccount: lanza 403 si la contraseña no coincide")
+    void testDeleteAccount_WrongPassword_Throws403() {
+        Role role = new Role((short) 2, "PISCICULTOR");
+        User user = new User(role, "Juan", "Pérez", "juan@correo.com", "3101234567", "hashed", "salt==");
+        user.setId(15);
+
+        when(userRepository.findByIdAndIsDeletedFalse(15)).thenReturn(Optional.of(user));
+        when(passwordService.verifyPassword("Incorrecta", "salt==", "hashed")).thenReturn(false);
+
+        assertThatThrownBy(() -> userService.deleteAccount(15, new DeleteAccountRequestDTO("Incorrecta")))
+                .isInstanceOf(BusinessException.class)
+                .hasMessage("Contraseña incorrecta")
+                .extracting(e -> ((BusinessException) e).getHttpStatus())
+                .isEqualTo(403);
+
+        verify(batchRepository, never()).saveAll(any());
+        verify(reportRepository, never()).saveAll(any());
+        verify(userRepository, never()).save(any());
+        verify(logService, never()).recordEvent(eq("USER_DELETED"), any(), any(), any(), any());
     }
 }

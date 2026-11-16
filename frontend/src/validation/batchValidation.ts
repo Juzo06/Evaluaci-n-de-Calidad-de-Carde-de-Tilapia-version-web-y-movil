@@ -1,4 +1,9 @@
-import type { BatchFormField, BatchFormValues, RegisterBatchRequestDTO } from "../types/batch";
+import type {
+  BatchFormField,
+  BatchFormValues,
+  ExpandFormErrors,
+  RegisterBatchRequestDTO,
+} from "../types/batch";
 
 export type BatchFormErrors = Partial<Record<BatchFormField, string>>;
 
@@ -68,4 +73,35 @@ export function toRegisterBatchRequest(values: BatchFormValues): RegisterBatchRe
     sampleUnitCount: Number(values.sampleUnitCount),
     notes: notes === "" ? null : notes,
   };
+}
+
+/**
+ * Validates sample expansion inputs according to DC-HU13 and DS-HU13.
+ */
+export function validateExpandForm(
+  values: { additionalUnits: string | number },
+  currentSampleUnitCount?: number,
+): ExpandFormErrors {
+  const errors: ExpandFormErrors = {};
+  const raw =
+    typeof values.additionalUnits === "number"
+      ? String(values.additionalUnits)
+      : values.additionalUnits.trim();
+
+  if (!raw) {
+    errors.additionalUnits = "El número de unidades adicionales es obligatorio";
+    return errors;
+  }
+
+  const additionalUnits = Number(raw);
+  if (!Number.isInteger(additionalUnits) || additionalUnits < 1 || additionalUnits > 499) {
+    errors.additionalUnits = "Las unidades adicionales deben ser un entero entre 1 y 499";
+    return errors;
+  }
+
+  if (currentSampleUnitCount !== undefined && currentSampleUnitCount + additionalUnits > 500) {
+    errors.additionalUnits = "La muestra no puede superar 500 unidades";
+  }
+
+  return errors;
 }

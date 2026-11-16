@@ -1,38 +1,53 @@
 package co.unillanos.secct.usecases.services;
 
+import co.unillanos.secct.entities.Batch;
+import co.unillanos.secct.entities.Report;
 import co.unillanos.secct.entities.Role;
 import co.unillanos.secct.entities.User;
+import co.unillanos.secct.infrastructure.repositories.BatchRepository;
+import co.unillanos.secct.infrastructure.repositories.ReportRepository;
 import co.unillanos.secct.infrastructure.repositories.RoleRepository;
 import co.unillanos.secct.infrastructure.repositories.UserRepository;
+import co.unillanos.secct.usecases.dto.DeleteAccountRequestDTO;
 import co.unillanos.secct.usecases.dto.RegisterUserRequestDTO;
 import co.unillanos.secct.usecases.dto.RegisterUserResponseDTO;
 import co.unillanos.secct.usecases.exceptions.BusinessException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Locale;
 
 /**
- * Service orchestrating HU-01 user registration according to DC-HU1 and DS-HU1.
+ * Service orchestrating HU-01 user registration and HU-08 account deletion.
  */
 @Service
 public class UserService {
 
     private static final String DEFAULT_ROLE_CODE = "PISCICULTOR";
     private static final String USER_REGISTERED_EVENT = "USER_REGISTERED";
+    private static final String USER_DELETED_EVENT = "USER_DELETED";
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
+    private final BatchRepository batchRepository;
+    private final ReportRepository reportRepository;
     private final PasswordService passwordService;
     private final LogService logService;
 
+    @Autowired
     public UserService(UserRepository userRepository,
                        RoleRepository roleRepository,
+                       BatchRepository batchRepository,
+                       ReportRepository reportRepository,
                        PasswordService passwordService,
                        LogService logService) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
+        this.batchRepository = batchRepository;
+        this.reportRepository = reportRepository;
         this.passwordService = passwordService;
         this.logService = logService;
     }
@@ -88,6 +103,47 @@ public class UserService {
         logService.recordEvent(USER_REGISTERED_EVENT, savedUser.getId(), null, null, auditDescription);
 
         return RegisterUserResponseDTO.from(savedUser);
+    }
+
+    /**
+     * HU-08: Verifies the user's password and logically deletes their batches, reports, and account (DS-HU8).
+     */
+    @Transactional(isolation = Isolation.READ_COMMITTED)
+    public void deleteAccount(Integer userId, DeleteAccountRequestDTO request) {
+        if (userId == null) {
+            throw new BusinessException("Usuario no autenticado", 401);
+        }
+
+        User user = userRepository.findByIdAndIsDeletedFalse(userId)
+                .orElseThrow(() -> new BusinessException("Usuario no encontrado", 404));
+
+        String rawPassword = request != null ? request.getPassword() : null;
+        if (rawPassword == null || rawPassword.isBlank()
+                || !passwordService.verifyPassword(rawPassword, user.getSalt(), user.getPasswordHash())) {
+            throw new BusinessException("Contraseña incorrecta", 403);
+        }
+
+        List<Batch> batches = batchRepository.findByOwnerIdAndIsDeletedFalse(userId);
+        if (!batches.isEmpty()) {
+            for (Batch batch : batches) {
+                batch.softDelete(userId);
+            }
+            batchRepository.saveAll(batches);
+        }
+
+        List<Report> reports = reportRepository.findByBatchOwnerIdAndIsDeletedFalse(userId);
+        if (!reports.isEmpty()) {
+            for (Report report : reports) {
+                report.softDelete(userId);
+            }
+            reportRepository.saveAll(reports);
+        }
+
+        user.softDelete(userId);
+        userRepository.save(user);
+
+        logService.recordEvent(USER_DELETED_EVENT, userId, null, null,
+                "Eliminación lógica de cuenta para " + user.getEmail());
     }
 
     private void validateBusinessRules(RegisterUserRequestDTO request, String normalizedEmail) {

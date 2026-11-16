@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
+              name="chart"
+              pageWidth="515"
+              pageHeight="220"
+              columnWidth="515"
+              leftMargin="0"
+              rightMargin="0"
+              topMargin="0"
+              bottomMargin="0"
+              whenNoDataType="AllSectionsNoDetail">
+    <field name="categoryLabel" class="java.lang.String"/>
+    <field name="unitCount" class="java.lang.Number"/>
+    <summary>
+        <band height="220">
+            <barChart>
+                <chart isShowLegend="false" evaluationTime="Report">
+                    <reportElement x="0" y="5" width="515" height="200"/>
+                    <chartTitle>
+                        <font fontName="SansSerif" size="11" isBold="true"/>
+                        <titleExpression><![CDATA["Distribución por categoría NTC 1443"]]></titleExpression>
+                    </chartTitle>
+                    <chartSubtitle/>
+                    <chartLegend/>
+                </chart>
+                <categoryDataset>
+                    <dataset resetType="Report"/>
+                    <categorySeries>
+                        <seriesExpression><![CDATA["Puntos evaluados"]]></seriesExpression>
+                        <categoryExpression><![CDATA[$F{categoryLabel}]]></categoryExpression>
+                        <valueExpression><![CDATA[$F{unitCount}]]></valueExpression>
+                    </categorySeries>
+                </categoryDataset>
+                <barPlot isShowLabels="true">
+                    <plot>
+                        <seriesColor seriesOrder="0" color="#094B72"/>
+                    </plot>
+                    <itemLabel>
+                        <font fontName="SansSerif" size="8"/>
+                    </itemLabel>
+                    <categoryAxisFormat>
+                        <axisFormat labelColor="#003465" tickLabelColor="#003465">
+                            <labelFont>
+                                <font fontName="SansSerif" size="9"/>
+                            </labelFont>
+                            <tickLabelFont>
+                                <font fontName="SansSerif" size="8"/>
+                            </tickLabelFont>
+                        </axisFormat>
+                    </categoryAxisFormat>
+                    <valueAxisFormat>
+                        <axisFormat labelColor="#003465" tickLabelColor="#003465">
+                            <labelFont>
+                                <font fontName="SansSerif" size="9"/>
+                            </labelFont>
+                            <tickLabelFont>
+                                <font fontName="SansSerif" size="8"/>
+                            </tickLabelFont>
+                        </axisFormat>
+                    </valueAxisFormat>
+                </barPlot>
+            </barChart>
+        </band>
+    </summary>
+</jasperReport>

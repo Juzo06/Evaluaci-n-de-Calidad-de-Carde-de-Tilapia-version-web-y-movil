@@ -1,0 +1,383 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
+              name="batch-report"
+              pageWidth="595"
+              pageHeight="842"
+              columnWidth="515"
+              leftMargin="40"
+              rightMargin="40"
+              topMargin="40"
+              bottomMargin="40"
+              whenNoDataType="AllSectionsNoDetail">
+    <parameter name="batchCode" class="java.lang.String"/>
+    <parameter name="version" class="java.lang.String"/>
+    <parameter name="currentStatus" class="java.lang.String"/>
+    <parameter name="generatedAt" class="java.lang.String"/>
+    <parameter name="captureDate" class="java.lang.String"/>
+    <parameter name="weightKg" class="java.lang.String"/>
+    <parameter name="sampleUnitCount" class="java.lang.String"/>
+    <parameter name="evaluationCount" class="java.lang.String"/>
+    <parameter name="finalClassification" class="java.lang.String"/>
+    <parameter name="eyeAverage" class="java.lang.String"/>
+    <parameter name="skinAverage" class="java.lang.String"/>
+    <parameter name="notes" class="java.lang.String"/>
+    <parameter name="chartImage" class="java.io.InputStream"/>
+    <parameter name="cat1Count" class="java.lang.Long"/>
+    <parameter name="cat2Count" class="java.lang.Long"/>
+    <parameter name="cat3Count" class="java.lang.Long"/>
+    <parameter name="cat4Count" class="java.lang.Long"/>
+    <parameter name="cat5Count" class="java.lang.Long"/>
+    <parameter name="cat1Pct" class="java.lang.String"/>
+    <parameter name="cat2Pct" class="java.lang.String"/>
+    <parameter name="cat3Pct" class="java.lang.String"/>
+    <parameter name="cat4Pct" class="java.lang.String"/>
+    <parameter name="cat5Pct" class="java.lang.String"/>
+    <title>
+        <band height="740">
+            <!-- Encabezado institucional -->
+            <rectangle>
+                <reportElement x="0" y="0" width="515" height="72" backcolor="#094B72"/>
+                <graphicElement>
+                    <pen lineWidth="0.0"/>
+                </graphicElement>
+            </rectangle>
+            <staticText>
+                <reportElement x="14" y="10" width="320" height="22" forecolor="#FFFFFF"/>
+                <textElement verticalAlignment="Middle">
+                    <font fontName="SansSerif" size="14" isBold="true"/>
+                </textElement>
+                <text><![CDATA[SECCT · Reporte de Calidad de Tilapia]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="14" y="34" width="320" height="16" forecolor="#DCEAF4"/>
+                <textElement verticalAlignment="Middle">
+                    <font fontName="SansSerif" size="9"/>
+                </textElement>
+                <text><![CDATA[Evaluación organoléptica basada en NTC 1443 / GTC 157]]></text>
+            </staticText>
+            <textField isBlankWhenNull="true">
+                <reportElement x="14" y="50" width="290" height="16" forecolor="#FFFFFF"/>
+                <textElement verticalAlignment="Middle">
+                    <font fontName="SansSerif" size="9" isBold="true"/>
+                </textElement>
+                <textFieldExpression><![CDATA["Lote: " + $P{batchCode}]]></textFieldExpression>
+            </textField>
+            <textField isBlankWhenNull="true">
+                <reportElement x="335" y="12" width="166" height="18" forecolor="#FFFFFF"/>
+                <textElement textAlignment="Right" verticalAlignment="Middle">
+                    <font fontName="SansSerif" size="10" isBold="true"/>
+                </textElement>
+                <textFieldExpression><![CDATA["Versión " + $P{version} + " · " + $P{currentStatus}]]></textFieldExpression>
+            </textField>
+            <textField isBlankWhenNull="true">
+                <reportElement x="315" y="34" width="186" height="28" forecolor="#DCEAF4"/>
+                <textElement textAlignment="Right" verticalAlignment="Middle">
+                    <font fontName="SansSerif" size="8"/>
+                </textElement>
+                <textFieldExpression><![CDATA["Generado: " + $P{generatedAt}]]></textFieldExpression>
+            </textField>
+
+            <!-- Datos del lote y resumen estadístico congelado -->
+            <staticText>
+                <reportElement x="0" y="84" width="515" height="18" forecolor="#003465"/>
+                <textElement verticalAlignment="Middle">
+                    <font fontName="SansSerif" size="11" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Datos del lote y resumen estadístico]]></text>
+            </staticText>
+
+            <textField isBlankWhenNull="true">
+                <reportElement x="0" y="106" width="168" height="36" mode="Opaque" backcolor="#F4F8FB"/>
+                <box leftPadding="6" rightPadding="6" topPadding="4" bottomPadding="4">
+                    <pen lineWidth="0.5" lineColor="#C8DCE8"/>
+                </box>
+                <textElement verticalAlignment="Middle">
+                    <font fontName="SansSerif" size="8"/>
+                </textElement>
+                <textFieldExpression><![CDATA["Fecha de captura:\n" + $P{captureDate}]]></textFieldExpression>
+            </textField>
+            <textField isBlankWhenNull="true">
+                <reportElement x="173" y="106" width="168" height="36" mode="Opaque" backcolor="#F4F8FB"/>
+                <box leftPadding="6" rightPadding="6" topPadding="4" bottomPadding="4">
+                    <pen lineWidth="0.5" lineColor="#C8DCE8"/>
+                </box>
+                <textElement verticalAlignment="Middle">
+                    <font fontName="SansSerif" size="8"/>
+                </textElement>
+                <textFieldExpression><![CDATA["Peso del lote:\n" + $P{weightKg} + " kg"]]></textFieldExpression>
+            </textField>
+            <textField isBlankWhenNull="true">
+                <reportElement x="346" y="106" width="169" height="36" mode="Opaque" backcolor="#F4F8FB"/>
+                <box leftPadding="6" rightPadding="6" topPadding="4" bottomPadding="4">
+                    <pen lineWidth="0.5" lineColor="#C8DCE8"/>
+                </box>
+                <textElement verticalAlignment="Middle">
+                    <font fontName="SansSerif" size="8"/>
+                </textElement>
+                <textFieldExpression><![CDATA["Muestra / Evaluaciones:\n" + $P{evaluationCount} + " de " + $P{sampleUnitCount} + " unidades"]]></textFieldExpression>
+            </textField>
+
+            <textField isBlankWhenNull="true">
+                <reportElement x="0" y="148" width="168" height="42" mode="Opaque" backcolor="#EBF4FA"/>
+                <box leftPadding="6" rightPadding="6" topPadding="4" bottomPadding="4">
+                    <pen lineWidth="0.75" lineColor="#094B72"/>
+                </box>
+                <textElement verticalAlignment="Middle">
+                    <font fontName="SansSerif" size="9" isBold="true"/>
+                </textElement>
+                <textFieldExpression><![CDATA["Clasificación final NTC:\n" + $P{finalClassification}]]></textFieldExpression>
+            </textField>
+            <textField isBlankWhenNull="true">
+                <reportElement x="173" y="148" width="168" height="42" mode="Opaque" backcolor="#F4F8FB"/>
+                <box leftPadding="6" rightPadding="6" topPadding="4" bottomPadding="4">
+                    <pen lineWidth="0.5" lineColor="#C8DCE8"/>
+                </box>
+                <textElement verticalAlignment="Middle">
+                    <font fontName="SansSerif" size="9" isBold="true"/>
+                </textElement>
+                <textFieldExpression><![CDATA["Promedio OJO:\n" + $P{eyeAverage}]]></textFieldExpression>
+            </textField>
+            <textField isBlankWhenNull="true">
+                <reportElement x="346" y="148" width="169" height="42" mode="Opaque" backcolor="#F4F8FB"/>
+                <box leftPadding="6" rightPadding="6" topPadding="4" bottomPadding="4">
+                    <pen lineWidth="0.5" lineColor="#C8DCE8"/>
+                </box>
+                <textElement verticalAlignment="Middle">
+                    <font fontName="SansSerif" size="9" isBold="true"/>
+                </textElement>
+                <textFieldExpression><![CDATA["Promedio PIEL:\n" + $P{skinAverage}]]></textFieldExpression>
+            </textField>
+
+            <textField isBlankWhenNull="true">
+                <reportElement x="0" y="196" width="515" height="42" mode="Opaque" backcolor="#FFFFFF"/>
+                <box leftPadding="6" rightPadding="6" topPadding="4" bottomPadding="4">
+                    <pen lineWidth="0.5" lineColor="#C8DCE8"/>
+                </box>
+                <textElement verticalAlignment="Top">
+                    <font fontName="SansSerif" size="8"/>
+                </textElement>
+                <textFieldExpression><![CDATA["Observaciones: " + $P{notes}]]></textFieldExpression>
+            </textField>
+
+            <!-- Gráfica de barras embebida -->
+            <image scaleImage="RetainShape" hAlign="Center" vAlign="Middle">
+                <reportElement x="0" y="250" width="515" height="215"/>
+                <box>
+                    <pen lineWidth="0.5" lineColor="#C8DCE8"/>
+                </box>
+                <imageExpression><![CDATA[$P{chartImage}]]></imageExpression>
+            </image>
+
+            <!-- Desglose por categoría NTC (1 a 5) -->
+            <staticText>
+                <reportElement x="0" y="480" width="515" height="18" forecolor="#003465"/>
+                <textElement verticalAlignment="Middle">
+                    <font fontName="SansSerif" size="11" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Distribución congelada por categoría NTC 1443 (1 a 5)]]></text>
+            </staticText>
+
+            <!-- Cabecera de tabla -->
+            <staticText>
+                <reportElement x="0" y="504" width="235" height="22" mode="Opaque" backcolor="#094B72" forecolor="#FFFFFF"/>
+                <box leftPadding="8" rightPadding="8">
+                    <pen lineWidth="0.5" lineColor="#094B72"/>
+                </box>
+                <textElement verticalAlignment="Middle">
+                    <font fontName="SansSerif" size="9" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Categoría organoléptica NTC]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="235" y="504" width="140" height="22" mode="Opaque" backcolor="#094B72" forecolor="#FFFFFF"/>
+                <box leftPadding="8" rightPadding="8">
+                    <pen lineWidth="0.5" lineColor="#094B72"/>
+                </box>
+                <textElement textAlignment="Right" verticalAlignment="Middle">
+                    <font fontName="SansSerif" size="9" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Puntos registrados]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="375" y="504" width="140" height="22" mode="Opaque" backcolor="#094B72" forecolor="#FFFFFF"/>
+                <box leftPadding="8" rightPadding="8">
+                    <pen lineWidth="0.5" lineColor="#094B72"/>
+                </box>
+                <textElement textAlignment="Right" verticalAlignment="Middle">
+                    <font fontName="SansSerif" size="9" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Porcentaje]]></text>
+            </staticText>
+
+            <!-- Fila Categoría 1 -->
+            <staticText>
+                <reportElement x="0" y="526" width="235" height="22" mode="Opaque" backcolor="#FFFFFF" forecolor="#003465"/>
+                <box leftPadding="8" rightPadding="8">
+                    <pen lineWidth="0.5" lineColor="#C8DCE8"/>
+                </box>
+                <textElement verticalAlignment="Middle">
+                    <font fontName="SansSerif" size="9"/>
+                </textElement>
+                <text><![CDATA[Categoría 1 (Rechazo / Deterioro severo)]]></text>
+            </staticText>
+            <textField>
+                <reportElement x="235" y="526" width="140" height="22" mode="Opaque" backcolor="#FFFFFF"/>
+                <box leftPadding="8" rightPadding="8">
+                    <pen lineWidth="0.5" lineColor="#C8DCE8"/>
+                </box>
+                <textElement textAlignment="Right" verticalAlignment="Middle">
+                    <font fontName="SansSerif" size="9"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$P{cat1Count}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="375" y="526" width="140" height="22" mode="Opaque" backcolor="#FFFFFF"/>
+                <box leftPadding="8" rightPadding="8">
+                    <pen lineWidth="0.5" lineColor="#C8DCE8"/>
+                </box>
+                <textElement textAlignment="Right" verticalAlignment="Middle">
+                    <font fontName="SansSerif" size="9"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$P{cat1Pct}]]></textFieldExpression>
+            </textField>
+
+            <!-- Fila Categoría 2 -->
+            <staticText>
+                <reportElement x="0" y="548" width="235" height="22" mode="Opaque" backcolor="#F4F8FB" forecolor="#003465"/>
+                <box leftPadding="8" rightPadding="8">
+                    <pen lineWidth="0.5" lineColor="#C8DCE8"/>
+                </box>
+                <textElement verticalAlignment="Middle">
+                    <font fontName="SansSerif" size="9"/>
+                </textElement>
+                <text><![CDATA[Categoría 2 (Frescura baja)]]></text>
+            </staticText>
+            <textField>
+                <reportElement x="235" y="548" width="140" height="22" mode="Opaque" backcolor="#F4F8FB"/>
+                <box leftPadding="8" rightPadding="8">
+                    <pen lineWidth="0.5" lineColor="#C8DCE8"/>
+                </box>
+                <textElement textAlignment="Right" verticalAlignment="Middle">
+                    <font fontName="SansSerif" size="9"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$P{cat2Count}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="375" y="548" width="140" height="22" mode="Opaque" backcolor="#F4F8FB"/>
+                <box leftPadding="8" rightPadding="8">
+                    <pen lineWidth="0.5" lineColor="#C8DCE8"/>
+                </box>
+                <textElement textAlignment="Right" verticalAlignment="Middle">
+                    <font fontName="SansSerif" size="9"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$P{cat2Pct}]]></textFieldExpression>
+            </textField>
+
+            <!-- Fila Categoría 3 -->
+            <staticText>
+                <reportElement x="0" y="570" width="235" height="22" mode="Opaque" backcolor="#FFFFFF" forecolor="#003465"/>
+                <box leftPadding="8" rightPadding="8">
+                    <pen lineWidth="0.5" lineColor="#C8DCE8"/>
+                </box>
+                <textElement verticalAlignment="Middle">
+                    <font fontName="SansSerif" size="9"/>
+                </textElement>
+                <text><![CDATA[Categoría 3 (Frescura aceptable)]]></text>
+            </staticText>
+            <textField>
+                <reportElement x="235" y="570" width="140" height="22" mode="Opaque" backcolor="#FFFFFF"/>
+                <box leftPadding="8" rightPadding="8">
+                    <pen lineWidth="0.5" lineColor="#C8DCE8"/>
+                </box>
+                <textElement textAlignment="Right" verticalAlignment="Middle">
+                    <font fontName="SansSerif" size="9"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$P{cat3Count}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="375" y="570" width="140" height="22" mode="Opaque" backcolor="#FFFFFF"/>
+                <box leftPadding="8" rightPadding="8">
+                    <pen lineWidth="0.5" lineColor="#C8DCE8"/>
+                </box>
+                <textElement textAlignment="Right" verticalAlignment="Middle">
+                    <font fontName="SansSerif" size="9"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$P{cat3Pct}]]></textFieldExpression>
+            </textField>
+
+            <!-- Fila Categoría 4 -->
+            <staticText>
+                <reportElement x="0" y="592" width="235" height="22" mode="Opaque" backcolor="#F4F8FB" forecolor="#003465"/>
+                <box leftPadding="8" rightPadding="8">
+                    <pen lineWidth="0.5" lineColor="#C8DCE8"/>
+                </box>
+                <textElement verticalAlignment="Middle">
+                    <font fontName="SansSerif" size="9"/>
+                </textElement>
+                <text><![CDATA[Categoría 4 (Buena frescura)]]></text>
+            </staticText>
+            <textField>
+                <reportElement x="235" y="592" width="140" height="22" mode="Opaque" backcolor="#F4F8FB"/>
+                <box leftPadding="8" rightPadding="8">
+                    <pen lineWidth="0.5" lineColor="#C8DCE8"/>
+                </box>
+                <textElement textAlignment="Right" verticalAlignment="Middle">
+                    <font fontName="SansSerif" size="9"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$P{cat4Count}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="375" y="592" width="140" height="22" mode="Opaque" backcolor="#F4F8FB"/>
+                <box leftPadding="8" rightPadding="8">
+                    <pen lineWidth="0.5" lineColor="#C8DCE8"/>
+                </box>
+                <textElement textAlignment="Right" verticalAlignment="Middle">
+                    <font fontName="SansSerif" size="9"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$P{cat4Pct}]]></textFieldExpression>
+            </textField>
+
+            <!-- Fila Categoría 5 -->
+            <staticText>
+                <reportElement x="0" y="614" width="235" height="22" mode="Opaque" backcolor="#FFFFFF" forecolor="#003465"/>
+                <box leftPadding="8" rightPadding="8">
+                    <pen lineWidth="0.5" lineColor="#C8DCE8"/>
+                </box>
+                <textElement verticalAlignment="Middle">
+                    <font fontName="SansSerif" size="9"/>
+                </textElement>
+                <text><![CDATA[Categoría 5 (Frescura óptima)]]></text>
+            </staticText>
+            <textField>
+                <reportElement x="235" y="614" width="140" height="22" mode="Opaque" backcolor="#FFFFFF"/>
+                <box leftPadding="8" rightPadding="8">
+                    <pen lineWidth="0.5" lineColor="#C8DCE8"/>
+                </box>
+                <textElement textAlignment="Right" verticalAlignment="Middle">
+                    <font fontName="SansSerif" size="9"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$P{cat5Count}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="375" y="614" width="140" height="22" mode="Opaque" backcolor="#FFFFFF"/>
+                <box leftPadding="8" rightPadding="8">
+                    <pen lineWidth="0.5" lineColor="#C8DCE8"/>
+                </box>
+                <textElement textAlignment="Right" verticalAlignment="Middle">
+                    <font fontName="SansSerif" size="9"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$P{cat5Pct}]]></textFieldExpression>
+            </textField>
+
+            <staticText>
+                <reportElement x="0" y="660" width="515" height="20" forecolor="#4D6A80"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font fontName="SansSerif" size="8"/>
+                </textElement>
+                <text><![CDATA[SECCT · Sistema de Evaluación de Calidad de Carne de Tilapia · Documento generado con estadísticas congeladas]]></text>
+            </staticText>
+        </band>
+    </title>
+</jasperReport>

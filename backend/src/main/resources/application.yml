@@ -26,7 +26,8 @@ spring:
 
 secct:
   cnn:
-    url: ${CNN_URL:http://localhost:8000}
+    url: ${CNN_URL:https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent}
+    api-key: ${GEMINI_API_KEY:}
   jwt:
     secret: ${JWT_SECRET:un_secreto_super_seguro_de_al_menos_32_caracteres_12345}
     expirationMinutes: ${JWT_EXPIRATION_MINUTES:30}

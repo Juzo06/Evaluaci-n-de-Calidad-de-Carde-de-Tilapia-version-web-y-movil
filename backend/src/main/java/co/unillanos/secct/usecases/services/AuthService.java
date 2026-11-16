@@ -37,7 +37,7 @@ public class AuthService {
     /**
      * Authenticates user credentials, records audit events, and issues a JWT token (DS-HU2-login).
      */
-    @Transactional(isolation = Isolation.READ_COMMITTED)
+    @Transactional(isolation = Isolation.READ_COMMITTED, noRollbackFor = BusinessException.class)
     public LoginResponseDTO login(LoginRequestDTO request) {
         if (request == null) {
             recordFailedLogin(null, null);
@@ -96,6 +96,6 @@ public class AuthService {
     private void recordFailedLogin(Integer userId, String email) {
         String masked = (email != null && !email.isBlank()) ? logService.maskSensitiveData(email) : "desconocido";
         String description = "Intento de inicio de sesión fallido para " + masked;
-        logService.recordEvent("LOGIN_FAILED", userId, null, null, description);
+        logService.recordSecurityFailure("LOGIN_FAILED", userId, description);
     }
 }

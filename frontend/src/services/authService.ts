@@ -1,4 +1,5 @@
 import type {
+  DeleteAccountRequestDTO,
   LoginRequestDTO,
   LoginResponseDTO,
   RegisterUserRequestDTO,
@@ -19,4 +20,9 @@ export async function logout(): Promise<void> {
 
 export async function register(request: RegisterUserRequestDTO): Promise<RegisterUserResponseDTO> {
   return apiPost<RegisterUserRequestDTO, RegisterUserResponseDTO>("/api/users", request);
+}
+
+/** HU-08: Requests logical cascade deletion of the authenticated user's account (DS-HU8). */
+export async function deleteAccount(request: DeleteAccountRequestDTO): Promise<void> {
+  return apiPost<DeleteAccountRequestDTO, void>("/api/users/me/delete", request);
 }
