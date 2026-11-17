@@ -116,9 +116,9 @@ describe("apiClient", () => {
     expect(resolveApiUrl("/api/batches")).toBe("/api/batches");
 
     vi.spyOn(Capacitor, "isNativePlatform").mockReturnValue(true);
-    expect(resolveApiUrl("/api/batches")).toBe("http://localhost:8080/api/batches");
+    expect(resolveApiUrl("/api/batches")).toBe("https://secct-backend.onrender.com/api/batches");
 
-    localStorage.setItem("secct_api_base_url", "http://192.168.1.25:8080/");
+    localStorage.setItem("secct_api_base_url", "http://192.168.1.25:8080///");
     expect(resolveApiUrl("/api/batches")).toBe("http://192.168.1.25:8080/api/batches");
 
     vi.stubEnv("VITE_API_BASE_URL", "https://api.secct.example.com/");

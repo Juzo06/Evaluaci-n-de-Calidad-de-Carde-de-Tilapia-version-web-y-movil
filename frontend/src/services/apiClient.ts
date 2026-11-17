@@ -2,7 +2,7 @@ import { Capacitor } from "@capacitor/core";
 import type { ErrorResponseDTO, FieldErrorDTO } from "../types/batch";
 import { getToken, removeLocalToken } from "./authStorage";
 
-const DEFAULT_NATIVE_API_BASE_URL = "http://localhost:8080";
+const DEFAULT_NATIVE_API_BASE_URL = "https://secct-backend.onrender.com";
 
 function joinBaseUrl(baseUrl: string, path: string): string {
   const normalizedBase = baseUrl.trim().replace(/\/+$/, "");

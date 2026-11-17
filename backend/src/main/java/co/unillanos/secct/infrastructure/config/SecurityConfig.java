@@ -49,9 +49,12 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOriginPatterns(List.of(
                 allowedOrigin,
-                "http://localhost",
+                "https://secct.vercel.app",
+                "https://*.vercel.app",
                 "https://localhost",
+                "http://localhost",
                 "capacitor://localhost",
+                "http://localhost:*",
                 "http://10.0.2.2:*",
                 "http://192.168.*:*"
         ));
@@ -61,6 +64,7 @@ public class SecurityConfig {
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/api/**", configuration);
+        source.registerCorsConfiguration("/actuator/**", configuration);
         return source;
     }
 }
