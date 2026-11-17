@@ -13,6 +13,8 @@ import co.unillanos.secct.usecases.dto.ReportStatistics;
 import co.unillanos.secct.usecases.dto.ReportSummaryDTO;
 import co.unillanos.secct.usecases.exceptions.BusinessException;
 import co.unillanos.secct.usecases.ports.ReportGenerator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -25,6 +27,8 @@ import java.util.List;
 /** Service implementing HU-06, HU-10, HU-11, HU-12 and HU-14 report workflows. */
 @Service
 public class ReportService {
+
+    private static final Logger log = LoggerFactory.getLogger(ReportService.class);
 
     private static final String REPORT_GENERATED_EVENT = "REPORT_GENERATED";
     private static final String REPORT_SAVED_EVENT = "REPORT_SAVED";
@@ -203,6 +207,7 @@ public class ReportService {
 
     private byte[] renderChartOrThrow(ReportStatistics statistics) {
         if (reportGenerator == null) {
+            log.error("ReportGenerator no disponible al renderizar gráfica");
             throw new BusinessException("No se pudo generar el reporte", 500);
         }
         try {
@@ -210,12 +215,14 @@ public class ReportService {
         } catch (BusinessException ex) {
             throw ex;
         } catch (RuntimeException ex) {
+            log.error("Fallo inesperado al renderizar gráfica del reporte", ex);
             throw new BusinessException("No se pudo generar el reporte", 500);
         }
     }
 
     private byte[] exportPdfOrThrow(Report report) {
         if (reportGenerator == null) {
+            log.error("ReportGenerator no disponible al exportar PDF");
             throw new BusinessException("No se pudo generar el PDF", 500);
         }
         try {
@@ -223,6 +230,7 @@ public class ReportService {
         } catch (BusinessException ex) {
             throw ex;
         } catch (RuntimeException ex) {
+            log.error("Fallo inesperado al exportar reporte a PDF", ex);
             throw new BusinessException("No se pudo generar el PDF", 500);
         }
     }

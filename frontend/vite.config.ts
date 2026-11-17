@@ -27,8 +27,14 @@ function buildObfuscatorPlugin(): Plugin {
 
 export default defineConfig({
   plugins: [react(), tailwindcss(), buildObfuscatorPlugin()],
+  esbuild: {
+    drop: ["console", "debugger"],
+    minifyIdentifiers: true,
+    minifySyntax: true,
+    minifyWhitespace: true,
+  },
   build: {
-    minify: true,
+    minify: "esbuild",
     sourcemap: false,
   },
   server: {

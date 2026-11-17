@@ -14,6 +14,8 @@ import co.unillanos.secct.usecases.dto.BatchResponseDTO;
 import co.unillanos.secct.usecases.dto.ExpandSampleRequestDTO;
 import co.unillanos.secct.usecases.dto.RegisterBatchRequestDTO;
 import co.unillanos.secct.usecases.exceptions.BusinessException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -27,6 +29,8 @@ import java.util.stream.Collectors;
 
 @Service
 public class BatchService {
+
+    private static final Logger log = LoggerFactory.getLogger(BatchService.class);
 
     private static final String INITIAL_STATUS_CODE = "ABIERTO";
     private static final String BATCH_REGISTERED_EVENT = "BATCH_REGISTERED";
@@ -135,6 +139,7 @@ public class BatchService {
         Batch batch = findOwnBatch(code, ownerId);
 
         if (!batch.isEvaluated()) {
+            log.warn("Intento de ampliar muestra en lote no evaluado: code={}, ownerId={}", code, ownerId);
             throw new BusinessException("Solo se puede ampliar un lote evaluado", 409);
         }
 
@@ -163,6 +168,7 @@ public class BatchService {
 
     private Batch findOwnBatch(String code, Integer ownerId) {
         if (ownerId == null) {
+            log.warn("Intento de acceso a lote {} sin usuario autenticado", code);
             throw new BusinessException("Usuario no autenticado", 401);
         }
         return batchRepository.findByCodeAndOwnerIdAndIsDeletedFalse(code, ownerId)

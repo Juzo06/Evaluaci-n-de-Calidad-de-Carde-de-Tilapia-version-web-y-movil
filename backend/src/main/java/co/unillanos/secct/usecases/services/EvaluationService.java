@@ -13,6 +13,8 @@ import co.unillanos.secct.usecases.dto.ClassificationResult;
 import co.unillanos.secct.usecases.dto.EvaluationResponseDTO;
 import co.unillanos.secct.usecases.exceptions.BusinessException;
 import co.unillanos.secct.usecases.ports.Classifier;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,6 +27,8 @@ import java.util.List;
 
 @Service
 public class EvaluationService {
+
+    private static final Logger log = LoggerFactory.getLogger(EvaluationService.class);
 
     private static final long MAX_IMAGE_BYTES = 5L * 1024 * 1024;
     private static final String UNIT_EVALUATED_EVENT = "UNIT_EVALUATED";
@@ -69,12 +73,15 @@ public class EvaluationService {
 
         long evaluationCount = evaluationRepository.countByBatchId(batch.getId());
         if (evaluationCount >= batch.getSampleUnitCount()) {
+            log.warn("Lote {} ya tiene todas sus unidades evaluadas ({}/{})", code, evaluationCount,
+                    batch.getSampleUnitCount());
             throw new BusinessException("El lote ya tiene todas sus unidades evaluadas ("
                     + evaluationCount + " de " + batch.getSampleUnitCount() + ")", 409);
         }
 
         String imageReference = generateImageReference(image);
         if (evaluationRepository.existsByBatchIdAndImageReference(batch.getId(), imageReference)) {
+            log.warn("Imagen duplicada rechazada en lote {}: {}", code, imageReference);
             throw new BusinessException("Esta imagen ya fue evaluada anteriormente. Carga una imagen distinta.", 409);
         }
 
@@ -107,6 +114,8 @@ public class EvaluationService {
 
         long evaluationCount = evaluationRepository.countByBatchId(batch.getId());
         if (evaluationCount < batch.getSampleUnitCount()) {
+            log.warn("Intento de cerrar lote {} con unidades pendientes ({}/{})", code, evaluationCount,
+                    batch.getSampleUnitCount());
             throw new BusinessException("Aún hay unidades sin clasificar (" + evaluationCount + " de "
                     + batch.getSampleUnitCount() + ")", 409);
         }
@@ -143,6 +152,7 @@ public class EvaluationService {
         try {
             return HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(image));
         } catch (NoSuchAlgorithmException e) {
+            log.error("Algoritmo SHA-256 no disponible", e);
             throw new IllegalStateException("SHA-256 is not available", e);
         }
     }

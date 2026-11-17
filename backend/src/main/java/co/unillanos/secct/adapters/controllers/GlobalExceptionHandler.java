@@ -29,28 +29,33 @@ public class GlobalExceptionHandler {
                 .toList();
         String message = "Datos inválidos en: "
                 + String.join(", ", errors.stream().map(FieldErrorDTO::field).distinct().toList());
+        logger.warn("Validation failed: {}", message);
         return ResponseEntity.badRequest().body(new ErrorResponseDTO(message, errors));
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<ErrorResponseDTO> handleUnreadable(HttpMessageNotReadableException exception) {
+        logger.warn("Unreadable HTTP message: {}", exception.getMessage());
         return ResponseEntity.badRequest().body(ErrorResponseDTO.of(
                 "El cuerpo de la solicitud no es válido. Verifica la fecha (AAAA-MM-DD) y los valores numéricos"));
     }
 
     @ExceptionHandler(MaxUploadSizeExceededException.class)
     public ResponseEntity<ErrorResponseDTO> handleTooLarge(MaxUploadSizeExceededException exception) {
+        logger.warn("Upload size exceeded: {}", exception.getMessage());
         return ResponseEntity.status(HttpStatus.CONTENT_TOO_LARGE).body(ErrorResponseDTO.of(
                 "La imagen supera el tamaño máximo de 5 MB"));
     }
 
     @ExceptionHandler(BusinessException.class)
     public ResponseEntity<ErrorResponseDTO> handleBusiness(BusinessException exception) {
+        logger.warn("BusinessException ({}): {}", exception.getHttpStatus(), exception.getMessage());
         return ResponseEntity.status(exception.getHttpStatus()).body(ErrorResponseDTO.of(exception.getMessage()));
     }
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     public ResponseEntity<ErrorResponseDTO> handleTypeMismatch(MethodArgumentTypeMismatchException exception) {
+        logger.warn("Type mismatch on parameter '{}': {}", exception.getName(), exception.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(ErrorResponseDTO.of("Parámetro inválido: " + exception.getName()));
     }

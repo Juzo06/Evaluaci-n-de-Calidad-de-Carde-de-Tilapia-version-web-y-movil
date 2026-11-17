@@ -6,6 +6,8 @@ import co.unillanos.secct.infrastructure.security.JwtService;
 import co.unillanos.secct.usecases.dto.LoginRequestDTO;
 import co.unillanos.secct.usecases.dto.LoginResponseDTO;
 import co.unillanos.secct.usecases.exceptions.BusinessException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,6 +20,8 @@ import java.util.Optional;
  */
 @Service
 public class AuthService {
+
+    private static final Logger log = LoggerFactory.getLogger(AuthService.class);
 
     private final UserRepository userRepository;
     private final PasswordService passwordService;
@@ -96,6 +100,7 @@ public class AuthService {
     private void recordFailedLogin(Integer userId, String email) {
         String masked = (email != null && !email.isBlank()) ? logService.maskSensitiveData(email) : "desconocido";
         String description = "Intento de inicio de sesión fallido para " + masked;
+        log.warn("LOGIN_FAILED userId={} email={}", userId, masked);
         logService.recordSecurityFailure("LOGIN_FAILED", userId, description);
     }
 }

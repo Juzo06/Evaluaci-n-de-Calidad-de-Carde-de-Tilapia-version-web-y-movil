@@ -1,239 +1,216 @@
 <img width="1536" height="1024" alt="99c65264-b4c5-447a-9f9b-4180013e07cd" src="https://github.com/user-attachments/assets/a36d6af1-edfc-4adb-8c77-bbbe9a703536" />
 
-
 # SECCT — Sistema de Evaluación de Calidad de Carne de Tilapia
 
-SECCT es una aplicación web para registrar y evaluar lotes de tilapia bajo los estándares **NTC 1443** y **GTC 157**. El piscicultor registra un lote, sube una fotografía de cada unidad de la muestra y el sistema la clasifica automáticamente con una red neuronal convolucional (CNN). Al evaluar todas las unidades se cierra el lote y se obtiene su clasificación final.
+**SECCT** es una plataforma web y móvil (**Android / Capacitor**) en arquitectura de dos niveles para registrar y evaluar la calidad sensorial y fisicoquímica de lotes de tilapia bajo las normas técnicas colombianas **NTC 1443** y **GTC 157**. El piscicultor registra lotes, captura o sube fotografías de cada unidad de muestra y el sistema clasifica `OJO` y `PIEL` en la escala NTC 1 a 5 mediante inteligencia artificial (Google Gemini Vision API / modelo CNN), consolidando el cierre del lote, reportes versionados con gráficas estadísticas y exportación a PDF.
 
 ---
 
-## Funcionalidades
+## Despliegue en Vivo y Entregables
+
+| Entorno | URL / Ubicación | Estado |
+| :--- | :--- | :--- |
+| **Aplicación Web (Vercel)** | [https://secct.vercel.app/](https://secct.vercel.app/) | En producción |
+| **API Backend (Render)** | [https://secct-backend.onrender.com](https://secct-backend.onrender.com) (`GET /actuator/health`) | En producción |
+| **Cliente Móvil Android (APK)** | `frontend/android/app/build/outputs/apk/debug/app-debug.apk` | Compilado y conectado a Render |
+
+---
+
+## Matriz de Cumplimiento — Entrega Final
+
+| Requerimiento de Rúbrica | Implementación y Evidencia en el Repositorio |
+| :--- | :--- |
+| **1. Versión Web y Móvil** | Web SPA en `frontend/src/` y app híbrida Android con **Capacitor 8** (`frontend/capacitor.config.ts`, `frontend/android/`, `frontend/src/services/platform.ts`, permisos en `frontend/android/app/src/main/AndroidManifest.xml`, APK en `frontend/android/app/build/outputs/apk/debug/app-debug.apk`). |
+| **2. Arquitectura en 2 Niveles** | Nivel 1 (Presentación/Cliente React + Capacitor en `frontend/src/`) desacoplado vía HTTPS REST/JSON (`frontend/src/services/apiClient.ts`) del Nivel 2 (Lógica y Persistencia Spring Boot + PostgreSQL en `backend/src/main/java/co/unillanos/secct/`). |
+| **3. ORM y Migraciones** | **Spring Data JPA / Hibernate** con 10 entidades en `backend/src/main/java/co/unillanos/secct/entities/`, repositorios en `backend/src/main/java/co/unillanos/secct/infrastructure/repositories/` y migraciones versionadas **Flyway** (`V1` a `V9`) en `backend/src/main/resources/db/migration/`. |
+| **4. Accesibilidad (> 70 / WCAG 2.1 AA)** | Contraste WCAG AA (`#094b72`, `#003465`, `#1E293B`), enlace de salto `#main-content` en `frontend/src/App.tsx`, foco visible `:focus-visible`, etiquetas `<label htmlFor>`, regiones `aria-live="polite"` y estados `:disabled` en `frontend/src/styles.css`. |
+| **5. Complemento de Accesibilidad** | Widget persistente `frontend/src/components/AccessibilityWidget.tsx` con 5 ajustes (tamaño de fuente, alto contraste, escala de grises, subrayado de enlaces y reducir animaciones) persistidos vía `frontend/src/services/accessibilityStorage.ts` (`localStorage` + `@capacitor/preferences`). |
+| **6. Minificación y Ofuscación** | Pipeline de build en `frontend/vite.config.ts` con `build.sourcemap: false`, `build.minify: "esbuild"` (`drop: ["console", "debugger"]`, minificación de identificadores, sintaxis y espacios) y plugin `javascript-obfuscator` en `renderChunk`. |
+| **7. Web Services (REST + IA externa)** | 8 controladores REST Spring WebMVC en `backend/src/main/java/co/unillanos/secct/adapters/controllers/` protegidos con JWT (`SecurityConfig.java`, `JwtService.java`) e integración externa con Gemini Vision API / CNN en `backend/src/main/java/co/unillanos/secct/infrastructure/classifier/HttpCnnClassifier.java`. |
+| **8. Generador de Reportes y Gráficas** | `backend/src/main/java/co/unillanos/secct/infrastructure/reports/JasperReportGenerator.java` junto con plantillas **JasperReports** `backend/src/main/resources/reports/batch-report.jrxml` (PDF A4 vertical en zona horaria `America/Bogota`) y `chart.jrxml` (gráfica PNG de barras). |
+| **9. Evidencia de Pruebas (271 tests)** | **240** pruebas automatizadas Backend (JUnit 5 + Mockito + MockMvc + H2 + JaCoCo) en `backend/src/test/java/co/unillanos/secct/` y **31** pruebas Frontend (Vitest) en `frontend/src/**/*.test.ts`. |
+| **10. Logs (Archivo y Auditoría BD)** | Trazas SLF4J hacia `backend/logs/secct.log` configuradas en `backend/src/main/resources/application.yml` (`GlobalExceptionHandler.java`, `AuthService.java`, `BatchService.java`, `EvaluationService.java`, `ReportService.java`, `LogService.java`) más auditoría en tabla `log` con enmascaramiento de datos sensibles (`RNF-SEC-04`). |
+| **11. Internacionalización (ES / EN)** | Contexto bilingüe completo Español / Inglés en `frontend/src/i18n/I18nContext.tsx` y diccionario `frontend/src/i18n/translations.ts`, con pruebas en `frontend/src/services/i18n.test.ts`. |
+| **12. Responsive Design** | Diseño adaptable móvil-primero con Tailwind CSS 4 (`frontend/src/styles.css`), `viewport-fit=cover` y `safe-area-inset` en `frontend/index.html` y barra lateral/hamburguesa adaptable en `frontend/src/components/SideNav.tsx`. |
+| **13. Semántica HTML5** | Uso estricto de `<header>`, `<nav>`, `<main id="main-content">`, `<section>`, `<article>`, `<aside>`, `<footer>`, `<dl>/<dt>/<dd>` y jerarquía de encabezados `<h1>–<h3>` en `frontend/src/App.tsx`, `frontend/src/pages/` y `frontend/src/components/`. |
+
+---
+
+## Funcionalidades (HU-01 a HU-14)
 
 | HU | Funcionalidad | Rol | Estado |
-| --- | --- | --- | --- |
-| HU-01 | Registro de usuarios | Piscicultor | Implementada |
-| HU-02 | Inicio y cierre de sesión (JWT) | Ambos | Implementada |
-| HU-03 | Registro de lotes | Piscicultor | Implementada |
-| HU-04 | Evaluación de lotes (clasificación por imagen y cierre) | Piscicultor | Implementada |
-| HU-05 | Consulta de lotes evaluados | Piscicultor | Implementada |
-| HU-07 | Monitoreo del sistema | Administrador | Parcial (solo interfaz) |
-| HU-06, 08 a 14 | Reportes, PDF, eliminaciones y ampliación de muestra | Piscicultor | Pendientes |
+| :--- | :--- | :--- | :--- |
+| **HU-01** | Registro de usuarios | Piscicultor | Implementada |
+| **HU-02** | Inicio y cierre de sesión (JWT) | Ambos | Implementada |
+| **HU-03** | Registro de lotes | Piscicultor | Implementada |
+| **HU-04** | Evaluación de lotes (clasificación por imagen y cierre) | Piscicultor | Implementada |
+| **HU-05** | Consulta de lotes evaluados | Piscicultor | Implementada |
+| **HU-06** | Generación de reporte y gráfica estadística en lectura | Piscicultor | Implementada |
+| **HU-07** | Monitoreo del sistema | Administrador | Implementada |
+| **HU-08** | Baja lógica de usuario (`POST /api/users/me/delete`) | Piscicultor | Implementada |
+| **HU-09** | Eliminación lógica de lote y reportes asociados | Piscicultor | Implementada |
+| **HU-10** | Almacenamiento y versionado de reportes | Piscicultor | Implementada |
+| **HU-11** | Consulta de reportes guardados | Piscicultor | Implementada |
+| **HU-12** | Exportación de reporte a PDF (JasperReports) | Piscicultor | Implementada |
+| **HU-13** | Ampliación de muestra en lote evaluado/reportado | Piscicultor | Implementada |
+| **HU-14** | Eliminación lógica de versión de reporte | Piscicultor | Implementada |
 
-### Reglas principales
+### Reglas de negocio principales
 
-- Todo usuario que se registra recibe el rol `PISCICULTOR`. El rol `ADMINISTRADOR` no se puede obtener desde el registro y debe asignarse directamente en la base de datos.
-- Un lote tiene fecha de captura (no futura), peso entre 0,01 y 10.000 kg, entre 1 y 500 unidades de muestra y observaciones opcionales (máx. 500 caracteres).
-- Estados del lote: `ABIERTO` → `EN_EVALUACION` → `EVALUADO` (existe también `REPORTADO`, reservado para los reportes).
-- Cada unidad se evalúa con una imagen (máx. 5 MB, formato validado). No se permite evaluar dos veces la misma imagen en un lote (se compara el hash SHA-256 del contenido).
-- La CNN clasifica dos partes del pez, `OJO` y `PIEL`, en una categoría NTC de 1 a 5.
-- El lote solo se puede cerrar cuando todas sus unidades fueron evaluadas. La clasificación final es el promedio de las categorías, redondeado a 2 decimales.
-- Los eventos relevantes (por ejemplo `UNIT_EVALUATED` y `EVALUATION_CLOSED`) se registran en la tabla de auditoría `log`.
+- Todo usuario registrado recibe el rol `PISCICULTOR`. El rol `ADMINISTRADOR` está restringido a gestión interna y en el cliente web accede al panel de monitoreo (`#/admin`); en la app móvil Android se protege el flujo exclusivamente para el rol piscicultor (HU-02 a HU-06).
+- Un lote tiene fecha de captura (no futura), peso entre `0,01` y `10.000` kg, entre `1` y `500` unidades de muestra y observaciones opcionales (máx. 500 caracteres).
+- Estados del lote: `ABIERTO` → `EN_EVALUACION` → `EVALUADO` → `REPORTADO` (reversible a `EVALUADO` si se elimina el reporte vigente o reabrible a `EN_EVALUACION` mediante HU-13).
+- Cada unidad se evalúa con una imagen (máx. 5 MB, formato JPG/PNG validado por cabecera binaria). No se permite evaluar dos veces la misma imagen en un lote (control por hash SHA-256).
+- El clasificador evalúa `OJO` y `PIEL` en categoría NTC de `1` a `5`; al cerrar el lote calcula la clasificación final promedio redondeada a 2 decimales.
 
 ---
 
-## Arquitectura
+## Arquitectura y Estructura del Proyecto
 
-El sistema tiene tres componentes que se comunican por HTTP:
-
-```
-Navegador (React)  ──►  Backend (Spring Boot)  ──►  Servicio CNN (FastAPI)
-   :5173                    :8080                         :8000
-                               │
-                               ▼
-                    PostgreSQL (Supabase)
+```text
+Navegador Web (Vercel) / APK Android (Capacitor)  ──HTTPS/JSON──►  Backend API (Render / Docker Java 21)
+                                                                            │
+                                                   ┌────────────────────────┴────────────────────────┐
+                                                   ▼                                                 ▼
+                                         PostgreSQL (Supabase)                           Google Gemini Vision API
 ```
 
 | Componente | Tecnología |
-| --- | --- |
-| Backend | Spring Boot 4.1.1, Java 21, Maven, Spring Security, Spring Data JPA, Flyway, Actuator |
-| Autenticación | JWT HS256 (jjwt 0.12.6), expiración de 30 minutos por defecto |
-| Base de datos | PostgreSQL alojado en Supabase |
-| Frontend | React 19, TypeScript, Vite 8, Tailwind CSS 4 |
-| Servicio de inferencia | Python 3.13, FastAPI, TensorFlow 2.21 |
+| :--- | :--- |
+| **Backend** | Spring Boot 4.1.1, Java 21, Maven Wrapper, Spring Security, Spring Data JPA, Flyway, JasperReports 7, Actuator |
+| **Autenticación** | JWT HS256 (`jjwt 0.12.6`), expiración configurable de 30 minutos por defecto |
+| **Base de datos** | PostgreSQL en Supabase (migraciones `V1` a `V9` + `H2` para suite unitaria/integración) |
+| **Frontend Web & Móvil** | React 19, TypeScript, Vite 8 (`esbuild` + `javascript-obfuscator`), Tailwind CSS 4, Capacitor 8 Android |
+| **Servicio IA / CNN** | Integración directa con `gemini-3.5-flash-lite:generateContent` en `HttpCnnClassifier` y respaldo Python/FastAPI en `servicioCNN/` |
 
-El backend sigue una arquitectura limpia por capas: `entities` (dominio), `usecases` (servicios, DTOs y puertos), `adapters` (controladores y filtro JWT) e `infrastructure` (configuración, repositorios y cliente HTTP de la CNN).
-
----
-
-## Estructura del proyecto
-
-```
+```text
 secct/
-├── backend/            API REST (Spring Boot)
+├── backend/
+│   ├── Dockerfile                          Imagen multi-etapa Java 21 con fonts-dejavu-core para JasperReports
 │   └── src/
 │       ├── main/java/co/unillanos/secct/
-│       │   ├── entities/          Entidades JPA y dominio
-│       │   ├── usecases/          dto/, exceptions/, ports/, services/
-│       │   ├── adapters/          controllers/, security/
-│       │   └── infrastructure/    config/, classifier/, repositories/, security/
+│       │   ├── entities/                   Entidades JPA de dominio (User, Batch, Evaluation, Report, Log, etc.)
+│       │   ├── usecases/                   dto/, exceptions/, ports/, services/
+│       │   ├── adapters/                   controllers/ (REST + GlobalExceptionHandler), security/
+│       │   └── infrastructure/             config/, classifier/, reports/, repositories/, security/
 │       ├── main/resources/
 │       │   ├── application.yml
-│       │   └── db/migration/      Migraciones Flyway
-│       └── test/                  Pruebas unitarias
-├── frontend/           Cliente web (React + Vite)
-│   └── src/            components/, pages/, services/, types/, validation/
-├── servicioCNN/        Servicio de inferencia (FastAPI)
-├── models/             Modelo CNN entrenado (modelo_calidad_tilapia.h5)
-├── docs/               Documentación, casos de uso y entregables
+│       │   ├── db/migration/               Migraciones Flyway V1 a V9
+│       │   └── reports/                    Plantillas JasperReports (batch-report.jrxml y chart.jrxml)
+│       └── test/java/co/unillanos/secct/   Suite de 240 pruebas unitarias e integración
+├── frontend/
+│   ├── vite.config.ts                      Minificación esbuild, sourcemap: false y ofuscación JS
+│   ├── capacitor.config.ts                 Configuración Capacitor (co.unillanos.secct)
+│   ├── android/                            Proyecto nativo Android Gradle y app-debug.apk
+│   └── src/
+│       ├── components/, pages/, i18n/, services/, types/, validation/
+│       └── **/*.test.ts                    Suite de 31 pruebas unitarias en Vitest
+├── servicioCNN/                            Servicio local alternativo de inferencia (FastAPI + TensorFlow)
+├── models/                                 Modelo CNN entrenado (modelo_calidad_tilapia.h5)
+├── docs/                                   Documentación de requerimientos, casos de uso y diagramas
 └── README.md
 ```
 
 ---
 
-## Requisitos
+## Configuración y Ejecución Local
 
-- Java 21
-- Node.js 20 o superior y npm
-- Python 3.13
-- Acceso a la base de datos PostgreSQL (Supabase)
-- Maven no es necesario: el backend incluye Maven Wrapper (`mvnw`)
+### Requisitos
+- **Java 21** (el proyecto incluye `./mvnw` / `mvnw.cmd`)
+- **Node.js 20+** y `npm`
+- Acceso a **PostgreSQL (Supabase)** y clave `GEMINI_API_KEY` (opcional `servicioCNN` con Python 3.13)
 
----
-
-## Configuración
-
-### Backend
-
-Crea el archivo `backend/.env` con las credenciales de la base de datos y la clave del JWT:
+### Variables de entorno del Backend (`backend/.env`)
 
 ```env
 DB_URL=jdbc:postgresql://<host>:5432/postgres?sslmode=require
 DB_USERNAME=<usuario>
 DB_PASSWORD=<contraseña>
 JWT_SECRET=<clave de al menos 32 caracteres>
+GEMINI_API_KEY=<clave API de Google Gemini>
 ```
-
-> **Importante:** el archivo `.env` contiene credenciales. No lo subas al repositorio (agrégalo al `.gitignore`) y usa una clave `JWT_SECRET` propia y larga.
-
-Variables opcionales:
 
 | Variable | Valor por defecto | Descripción |
-| --- | --- | --- |
-| `DB_POOL_SIZE` | `20` | Tamaño del pool de conexiones |
-| `JWT_EXPIRATION_MINUTES` | `30` | Duración del token en minutos |
-| `CNN_URL` | `http://localhost:8000` | URL del servicio de inferencia |
-| `CORS_ORIGIN` | `http://localhost:5173` | Origen permitido para el frontend |
+| :--- | :--- | :--- |
+| `PORT` | `8080` | Puerto HTTP del servidor (Render / local) |
+| `DB_POOL_SIZE` | `20` | Tamaño máximo del pool HikariCP |
+| `JWT_EXPIRATION_MINUTES` | `30` | Duración del token JWT en minutos |
+| `CNN_URL` | `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent` | Endpoint del clasificador |
+| `CORS_ORIGIN` | `http://localhost:5173` | Origen adicional permitido en CORS |
 
-Las migraciones de Flyway se aplican automáticamente al iniciar el backend.
-
-### Servicio CNN
-
-Crea el entorno virtual e instala las dependencias (una sola vez):
+### Comandos de arranque
 
 ```bash
-cd servicioCNN
-python3 -m venv .venv
-.venv/bin/pip install -r requirements.txt
-```
+# Terminal 1: Backend (Spring Boot)
+cd backend
+./mvnw spring-boot:run          # En Windows PowerShell: .\mvnw.cmd spring-boot:run
 
-El servicio busca el modelo en `models/modelo_calidad_tilapia.h5`. Si el archivo está en otra ruta o tiene otro nombre, define la variable `SECCT_MODELO_H5`. Si el archivo no existe, el servicio no arranca.
-
-> No actualices TensorFlow sin comprobar antes que el modelo sigue cargando: el servicio incluye un ajuste de compatibilidad para modelos guardados con Keras 2.
-
-### Frontend
-
-```bash
+# Terminal 2: Frontend (React + Vite)
 cd frontend
 npm install
+npm run dev                     # http://localhost:5173
 ```
-
-En desarrollo, Vite redirige las peticiones `/api` a `http://localhost:8080`. Para apuntar a otro backend define `VITE_API_URL`.
 
 ---
 
-## Ejecución
+## API REST y Rutas del Frontend
 
-### Opción 1: script de arranque (Linux/macOS)
-
-Desde la raíz del proyecto:
-
-```bash
-chmod +x iniciar_secct.sh
-./iniciar_secct.sh
-```
-
-El script levanta el servicio CNN, espera a que responda y luego inicia el backend y el frontend. Los registros quedan en `.logs/`. Con `Ctrl+C` se detienen los tres procesos.
-
-### Opción 2: manual (tres terminales)
-
-```bash
-# Terminal 1: servicio CNN
-cd servicioCNN
-.venv/bin/python servicio_inferencia.py
-
-# Terminal 2: backend
-cd backend
-./mvnw spring-boot:run          # En Windows: mvnw.cmd spring-boot:run
-
-# Terminal 3: frontend
-cd frontend
-npm run dev
-```
-
-Abre la aplicación en **http://localhost:5173**.
-
----
-
-## API REST
-
-Todos los endpoints requieren el encabezado `Authorization: Bearer <token>`, excepto los marcados como públicos.
+Todos los endpoints bajo `/api/**` requieren cabecera `Authorization: Bearer <token>`, salvo registro, login y `/actuator/health`.
 
 | Método | Endpoint | Descripción | Acceso |
-| --- | --- | --- | --- |
-| POST | `/api/auth/registro` y `/api/users` | Registrar usuario (HU-01) | Público |
-| POST | `/api/auth/login` | Iniciar sesión (HU-02) | Público |
-| POST | `/api/auth/logout` | Cerrar sesión | Autenticado |
-| POST | `/api/batches` | Registrar lote (HU-03) | Autenticado |
-| GET | `/api/batches` y `/api/batches/available` | Lotes abiertos o en evaluación del usuario | Autenticado |
-| GET | `/api/batches/evaluated` | Lotes evaluados (HU-05); equivale a `/api/batches?estado=EVALUADO` | Autenticado |
-| GET | `/api/batches/{code}` | Consultar un lote por código | Autenticado |
-| POST | `/api/evaluations/batches/{code}/units` | Evaluar una unidad (multipart, campo `image`) | Autenticado |
-| POST | `/api/evaluations/batches/{code}/close` | Cerrar la evaluación del lote | Autenticado |
-| GET | `/actuator/health` | Estado del servicio | Público |
+| :--- | :--- | :--- | :--- |
+| `POST` | `/api/auth/registro` y `/api/users` | Registrar usuario (HU-01) | Público |
+| `POST` | `/api/auth/login` | Iniciar sesión JWT (HU-02) | Público |
+| `POST` | `/api/auth/logout` | Cerrar sesión y registrar auditoría (HU-02) | Autenticado |
+| `POST` | `/api/users/me/delete` | Baja lógica de la cuenta propia (HU-08) | Autenticado |
+| `POST` | `/api/batches` | Registrar lote (HU-03) | Autenticado |
+| `GET` | `/api/batches` y `/api/batches/available` | Listar lotes abiertos o en evaluación | Autenticado |
+| `GET` | `/api/batches/evaluated` | Listar lotes evaluados o reportados (HU-05) | Autenticado |
+| `GET` | `/api/batches/{code}` | Consultar lote por código | Autenticado |
+| `DELETE` | `/api/batches/{code}` | Eliminación lógica de lote y reportes (HU-09) | Autenticado |
+| `POST` | `/api/batches/{code}/expand` | Ampliar muestra de lote evaluado (HU-13) | Autenticado |
+| `POST` | `/api/evaluations/batches/{code}/units` | Evaluar unidad por imagen multipart (HU-04) | Autenticado |
+| `POST` | `/api/evaluations/batches/{code}/close` | Cerrar evaluación y calcular categoría NTC | Autenticado |
+| `GET` | `/api/reports/batches/{code}` | Generar reporte previo y gráfica PNG (HU-06) | Autenticado |
+| `POST` | `/api/reports/batches/{code}` | Guardar nueva versión de reporte (HU-10) | Autenticado |
+| `GET` | `/api/reports` y `/api/reports/{id}` | Listar o consultar reportes guardados (HU-11) | Autenticado |
+| `GET` | `/api/reports/{id}/pdf` | Exportar reporte en PDF A4 (HU-12) | Autenticado |
+| `DELETE` | `/api/reports/{id}` | Eliminación lógica de versión de reporte (HU-14) | Autenticado |
+| `GET` | `/api/admin/system-info` | Monitoreo y conteos globales del sistema (HU-07) | `ADMINISTRADOR` |
+| `GET` | `/actuator/health` | Estado de salud del servicio | Público |
 
-El servicio CNN expone `GET /` (estado y modelo cargado), `POST /evaluar` (recibe `imagen_base64` y devuelve la categoría NTC de `OJO` y `PIEL`) y la documentación interactiva en `/docs`.
-
-### Rutas del frontend
-
-La aplicación usa rutas por hash: `#/login`, `#/registro`, `#/register` (registrar lote), `#/evaluate`, `#/evaluados` y `#/admin`. Las rutas protegidas redirigen a `#/login` si no hay sesión.
+### Rutas del cliente SPA (`hash`)
+- Públicas: `#/login`, `#/registro`
+- Piscicultor (Web y Móvil): `#/register`, `#/evaluate`, `#/evaluados`, `#/reportes/lote`
+- Piscicultor (Web escritorio): `#/gestion`, `#/reportes`, `#/reportes/{id}`, `#/cuenta`
+- Administrador (Web escritorio): `#/admin`
 
 ---
 
-## Pruebas
+## Pruebas Automatizadas y Compilación de Producción
+
+### Backend (`240` pruebas)
 
 ```bash
 cd backend
-./mvnw test
+./mvnw test                     # Windows PowerShell: .\mvnw.cmd test
 ```
 
-Las pruebas usan JUnit, Spring Test y H2, y cubren el registro de usuarios, los DTO, las entidades, el servicio de contraseñas y el registro de eventos. El reporte de cobertura lo genera Jacoco. El frontend no tiene pruebas automatizadas todavía.
-
-Para generar la versión de producción del frontend:
+### Frontend (`31` pruebas + build minificado/ofuscado + Android APK)
 
 ```bash
 cd frontend
-npm run build
+npm test                        # 31 pruebas unitarias en Vitest
+npm run build                   # Compilación TS + minificación esbuild + ofuscación JS (sin sourcemaps)
+npx cap sync android            # Sincronización con proyecto Capacitor Android
 ```
 
 ---
 
-## Registros (logs)
+## Registros (Logs) y Auditoría
 
-- Archivo de aplicación: `backend/logs/secct.log`.
-- Auditoría de negocio: tabla `log` en la base de datos.
-- Servicio CNN, backend y frontend (si se usa el script): carpeta `.logs/`.
-
----
-
-## Documentación
-
-La carpeta `docs/` contiene el análisis y diseño del proyecto:
-
-- Requerimientos y actas de las reuniones con el cliente.
-- Casos de uso por iteración, diagramas de clases y de secuencia.
-- `GUIA_ENTRENAMIENTO_MODELO.md`: proceso, datos y parámetros del clasificador CNN.
-- `RESTRICCIONES_INTEGRACION_MODELO.md`: condiciones que debe cumplir cualquier modelo que se integre al sistema.
-- Informe semestral y documentación de arquitectura y herramientas.
+- **Archivo de trazas de aplicación:** `backend/logs/secct.log` (SLF4J/Logback con eventos de negocio, validaciones `WARN` en `GlobalExceptionHandler` / servicios y excepciones `ERROR`).
+- **Auditoría transaccional en BD:** tabla `log` administrada por `LogService` con enmascaramiento automático de correos y teléfonos (`RNF-SEC-04`).
 
 ---
 
